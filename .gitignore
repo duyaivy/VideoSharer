@@ -1,0 +1,53 @@
+### Eclipse ###
+.project
+.classpath
+.settings/
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+
+### Build output (Eclipse, Ant, Tomcat) ###
+build/
+target/
+out/
+*.war
+
+### Logs ###
+*.log
+
+### OS-specific ###
+.DS_Store
+Thumbs.db
+
+### Java ###
+*.class
+*.jar
+!WebContent/WEB-INF/lib/mysql-connector-j-8.0.33.jar
+*.iml
+
+### Tomcat work directories ###
+work/
+temp/
+logs/
+
+### Maven / Gradle ###
+.mvn/
+.gradle/
+build/
+
+### WebContent uploads (bạn yêu cầu) ###
+# Ignore entire HLS folders
+WebContent/uploads/hls/
+
+# Ignore all original uploaded video folders
+WebContent/uploads/original/
+
+# If file upper/lowercase mismatch:
+webcontent/uploads/hls/
+webcontent/uploads/original/
+
+### Other ###
+.idea/
+*.orig
