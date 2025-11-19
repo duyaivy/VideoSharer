@@ -150,24 +150,27 @@ public class videoDAO {
 	    }
 	}
 	
-	// ===== LẤY DANH SÁCH VIDEO MỚI NHẤT =====
 	public List<Video> getLatestVideos(int limit) {
 	    List<Video> videos = new ArrayList<>();
+	    Connection conn = null;
+	    PreparedStatement pstm = null;
+	    ResultSet rs = null;
+	    
 	    try {
-	        if (conn == null)
-	            conn = ConnectDatabase.getMySQLConnection();
-
+	        conn = ConnectDatabase.getMySQLConnection();
 	        String sql = "SELECT v.*, u.name as author_name " +
 	                     "FROM video v " +
 	                     "JOIN user u ON v.author_id = u.id " +
-	                     "WHERE v.status = 'ready' " +
+	                     "WHERE v.status IN ('ready', 'done', 'pending', 'processing') " +  // ⭐ SỬA DÒNG NÀY
 	                     "ORDER BY v.create_at DESC " +
 	                     "LIMIT ?";
 	        
+	        System.out.println("✅ videoDAO: Executing query...");
 	        pstm = conn.prepareStatement(sql);
 	        pstm.setInt(1, limit);
 	        rs = pstm.executeQuery();
 
+	        int count = 0;
 	        while (rs.next()) {
 	            Video video = new Video();
 	            video.setVideoId(rs.getInt("video_id"));
@@ -182,22 +185,25 @@ public class videoDAO {
 	            video.setAuthorName(rs.getString("author_name"));
 	            
 	            videos.add(video);
+	            count++;
 	        }
+	        
 
 	    } catch (Exception e) {
-	        System.err.println("Lỗi khi lấy danh sách video!");
+	        System.err.println("❌ videoDAO: ERROR!");
 	        e.printStackTrace();
 	    } finally {
 	        try {
 	            if (rs != null) rs.close();
 	            if (pstm != null) pstm.close();
+	            if (conn != null) conn.close();
 	        } catch (Exception e) {
 	            e.printStackTrace();
 	        }
 	    }
+	    
 	    return videos;
 	}
-
 	// ===== LẤY VIDEO TRENDING (NHIỀU VIEW NHẤT) =====
 	public List<Video> getTrendingVideos(int limit) {
 	    List<Video> videos = new ArrayList<>();
@@ -208,7 +214,7 @@ public class videoDAO {
 	        String sql = "SELECT v.*, u.name as author_name " +
 	                     "FROM video v " +
 	                     "JOIN user u ON v.author_id = u.id " +
-	                     "WHERE v.status = 'ready' " +
+	                     "WHERE v.IN ('ready', 'done', 'pending', 'processing') " +
 	                     "ORDER BY v.view DESC " +
 	                     "LIMIT ?";
 	        
@@ -246,7 +252,6 @@ public class videoDAO {
 	    return videos;
 	}
 
-	// ===== TĂNG VIEW COUNTER (CẢI TIẾN) =====
 	public void incrementView(int videoId) {
 	    try {
 	        if (conn == null)

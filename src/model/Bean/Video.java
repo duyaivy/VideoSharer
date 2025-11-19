@@ -2,9 +2,7 @@ package model.Bean;
 
 import java.sql.Timestamp;
 
-/**
- * Video Bean - Đại diện cho bảng video trong database
- */
+
 public class Video {
     private int videoId;
     private int authorId;

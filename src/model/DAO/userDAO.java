@@ -13,12 +13,11 @@ public class userDAO {
     ResultSet rs = null;
     PreparedStatement pstm = null;
 
-    // Constructor
+   
     public userDAO() {
         conn = ConnectDatabase.getMySQLConnection();
     }
 
-    // ===== METHOD CŨ - LOGIN (GIỮ NGUYÊN) =====
     public boolean login(User u) {
         try {
             if (conn == null)
@@ -172,7 +171,7 @@ public class userDAO {
         }
     }
 
-    // ===== CẬP NHẬT USER =====
+   
     public boolean updateUser(User user) {
         try {
             if (conn == null)
@@ -204,7 +203,7 @@ public class userDAO {
         }
     }
 
-    // ===== XÓA USER =====
+   
     public boolean deleteUser(int id) {
         try {
             if (conn == null)
@@ -234,7 +233,7 @@ public class userDAO {
         }
     }
 
-    // ===== ĐÓNG KẾT NỐI =====
+    
     public void closeConnection() {
         try {
             if (rs != null) {

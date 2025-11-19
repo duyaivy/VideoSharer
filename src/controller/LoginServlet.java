@@ -92,6 +92,6 @@ public class LoginServlet extends HttpServlet {
             session.setMaxInactiveInterval(30 * 60); // 30 phút
         }
         
-        response.sendRedirect(request.getContextPath() + "/home.jsp");
+        response.sendRedirect(request.getContextPath() + "/home");
     }
 }
