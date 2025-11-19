@@ -1,16 +1,17 @@
 package model.BO;
 
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import javax.servlet.http.Part;
+
 import helpers.Ffmpeg;
 import helpers.ViewPath;
 import model.Bean.Video;
 import model.DAO.VideoQueueDAO;
 import model.DAO.videoDAO;
-import java.io.File;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class videoBO {
 	videoDAO dao;
@@ -49,7 +50,6 @@ public class videoBO {
 				System.out.println("Upload ok" + bytes + " bytes");
 			}
 
-
 			dao.updateVideoStatus(videoId, "processing");
 
 			// thumbnail
@@ -65,32 +65,27 @@ public class videoBO {
 				return false;
 			}
 
-			
-
 			String relativeVideoPath = Paths.get("uploads/original/video_" + videoId, safeFileName).toString()
 					.replace("\\", "/");
 			String relativeImgPath = Paths.get("uploads/original/video_" + videoId, thumbFileName).toString()
 					.replace("\\", "/");
 
 			dao.updateVideoPath(videoId, relativeVideoPath, relativeImgPath);
-			
-			 
-	       // them vao queue
-	        VideoQueueDAO queueDAO = new VideoQueueDAO();
-	        boolean addedToQueue = queueDAO.addToQueue(videoId);
-	        
-	        if (addedToQueue) {
-	            System.out.println("✅ Video added to encoding queue: " + videoId);
-	            dao.updateVideoStatus(videoId, "pending"); 
-	        } else {
-	            System.err.println("❌ Failed to add to queue");
-	            dao.updateVideoStatus(videoId, "failed");
-	            return false;
-	        }
-	        
-	        return true;
-			
-			
+
+			// them vao queue
+			VideoQueueDAO queueDAO = new VideoQueueDAO();
+			boolean addedToQueue = queueDAO.addToQueue(videoId);
+
+			if (addedToQueue) {
+				System.out.println("✅ Video added to encoding queue: " + videoId);
+				dao.updateVideoStatus(videoId, "pending");
+			} else {
+				System.err.println("❌ Failed to add to queue");
+				dao.updateVideoStatus(videoId, "failed");
+				return false;
+			}
+
+			return true;
 
 		} catch (Exception e) {
 
@@ -124,4 +119,19 @@ public class videoBO {
 		}
 		return null;
 	}
+
+	// ------Nhung
+	// Đếm tổng số video của 1 author
+	public int countVideosByAuthor(int authorId) {
+		return dao.countByAuthor(authorId);
+	}
+
+	// Lấy danh sách video theo author + phân trang
+	public java.util.List<Video> getVideosByAuthorWithPaging(int authorId, int page, int pageSize) {
+		if (page < 1)
+			page = 1;
+		int offset = (page - 1) * pageSize;
+		return dao.getVideosByAuthor(authorId, offset, pageSize);
+	}
+	// ----------Nhung------
 }
