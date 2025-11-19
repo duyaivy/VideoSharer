@@ -52,7 +52,7 @@ public class userDAO {
         return false;
     }
 
-    // ===== LẤY USER THEO EMAIL =====
+   
     public User getUserByEmail(String email) {
         User user = null;
         try {
@@ -95,7 +95,7 @@ public class userDAO {
         return user;
     }
 
-    // ===== LẤY USER THEO ID =====
+   
     public User getUserById(int id) {
         User user = null;
         try {
@@ -138,7 +138,7 @@ public class userDAO {
         return user;
     }
 
-    // ===== TẠO USER MỚI (ĐĂNG KÝ) =====
+   
     public boolean createUser(User user) {
         try {
             if (conn == null)

@@ -26,7 +26,6 @@ public class videoBO {
 
 		Video vd = dao.createVideo(authorId, title, des);
 		if (vd == null) {
-			System.out.println("❌ Failed to create video in DB");
 			return false;
 		}
 

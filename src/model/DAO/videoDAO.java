@@ -190,7 +190,7 @@ public class videoDAO {
 	        
 
 	    } catch (Exception e) {
-	        System.err.println("❌ videoDAO: ERROR!");
+	      
 	        e.printStackTrace();
 	    } finally {
 	        try {
@@ -204,7 +204,6 @@ public class videoDAO {
 	    
 	    return videos;
 	}
-	// ===== LẤY VIDEO TRENDING (NHIỀU VIEW NHẤT) =====
 	public List<Video> getTrendingVideos(int limit) {
 	    List<Video> videos = new ArrayList<>();
 	    try {

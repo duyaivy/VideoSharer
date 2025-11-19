@@ -25,12 +25,10 @@ public class HomeServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
-        System.out.println("========================================");
-        System.out.println("⭐ HomeServlet: Loading videos...");
         
         List<Video> videos = videoDao.getLatestVideos(20);
         
-        System.out.println("⭐ Total videos: " + (videos != null ? videos.size() : "NULL"));
+      
         
         if (videos != null && videos.size() > 0) {
             for (Video v : videos) {
