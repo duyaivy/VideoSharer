@@ -25,9 +25,7 @@ public class HomeServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
-        // KHÔNG check session - ai cũng xem được
         
-        // Lấy danh sách video mới nhất (20 video)
         List<Video> videos = videoDao.getLatestVideos(20);
         
         // Truyền data sang JSP

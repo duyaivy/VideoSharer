@@ -13,11 +13,11 @@ import javax.servlet.http.Part;
 import model.Bean.User;
 import helpers.ViewPath;
 
-@WebServlet("/upload-video")  // ⭐ GIỮ NGUYÊN
+@WebServlet("/upload-video")
 @MultipartConfig(
-    fileSizeThreshold = 1024 * 1024 * 2,
-    maxFileSize = 1024 * 1024 * 100,
-    maxRequestSize = 1024 * 1024 * 100
+    fileSizeThreshold = 1024 * 1024 * 2, // 2MB
+    maxFileSize = 1024 * 1024 * 100,      // 100MB
+    maxRequestSize = 1024 * 1024 * 100    // 100MB
 )
 public class UploadVideoServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
@@ -31,14 +31,15 @@ public class UploadVideoServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        // ⭐ CHECK LOGIN
+       
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
+            // Chưa login → Redirect về trang login
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
         
-        // Hiển thị form upload
+   
         request.getRequestDispatcher(ViewPath.resolve("UploadVideo")).forward(request, response);
     }
     
@@ -48,14 +49,14 @@ public class UploadVideoServlet extends HttpServlet {
         
         request.setCharacterEncoding("UTF-8");
         
-        // ⭐ CHECK LOGIN
+
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
         
-        // ⭐ LẤY USER ID TỪ SESSION
+   
         User user = (User) session.getAttribute("user");
         int authorId = user.getId();
         
