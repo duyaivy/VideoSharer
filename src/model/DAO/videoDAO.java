@@ -6,6 +6,8 @@ import java.sql.SQLException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.ArrayList;  
+import java.util.List;       
 
 import model.Bean.Video;
 
@@ -145,6 +147,125 @@ public class videoDAO {
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	        return false;
+	    }
+	}
+	
+	// ===== LẤY DANH SÁCH VIDEO MỚI NHẤT =====
+	public List<Video> getLatestVideos(int limit) {
+	    List<Video> videos = new ArrayList<>();
+	    try {
+	        if (conn == null)
+	            conn = ConnectDatabase.getMySQLConnection();
+
+	        String sql = "SELECT v.*, u.name as author_name " +
+	                     "FROM video v " +
+	                     "JOIN user u ON v.author_id = u.id " +
+	                     "WHERE v.status = 'ready' " +
+	                     "ORDER BY v.create_at DESC " +
+	                     "LIMIT ?";
+	        
+	        pstm = conn.prepareStatement(sql);
+	        pstm.setInt(1, limit);
+	        rs = pstm.executeQuery();
+
+	        while (rs.next()) {
+	            Video video = new Video();
+	            video.setVideoId(rs.getInt("video_id"));
+	            video.setAuthorId(rs.getInt("author_id"));
+	            video.setTitle(rs.getString("title"));
+	            video.setDescription(rs.getString("description"));
+	            video.setImg(rs.getString("img"));
+	            video.setCreateAt(rs.getTimestamp("create_at"));
+	            video.setStatus(rs.getString("status"));
+	            video.setPath(rs.getString("path"));
+	            video.setView(rs.getLong("view"));
+	            video.setAuthorName(rs.getString("author_name"));
+	            
+	            videos.add(video);
+	        }
+
+	    } catch (Exception e) {
+	        System.err.println("Lỗi khi lấy danh sách video!");
+	        e.printStackTrace();
+	    } finally {
+	        try {
+	            if (rs != null) rs.close();
+	            if (pstm != null) pstm.close();
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	    }
+	    return videos;
+	}
+
+	// ===== LẤY VIDEO TRENDING (NHIỀU VIEW NHẤT) =====
+	public List<Video> getTrendingVideos(int limit) {
+	    List<Video> videos = new ArrayList<>();
+	    try {
+	        if (conn == null)
+	            conn = ConnectDatabase.getMySQLConnection();
+
+	        String sql = "SELECT v.*, u.name as author_name " +
+	                     "FROM video v " +
+	                     "JOIN user u ON v.author_id = u.id " +
+	                     "WHERE v.status = 'ready' " +
+	                     "ORDER BY v.view DESC " +
+	                     "LIMIT ?";
+	        
+	        pstm = conn.prepareStatement(sql);
+	        pstm.setInt(1, limit);
+	        rs = pstm.executeQuery();
+
+	        while (rs.next()) {
+	            Video video = new Video();
+	            video.setVideoId(rs.getInt("video_id"));
+	            video.setAuthorId(rs.getInt("author_id"));
+	            video.setTitle(rs.getString("title"));
+	            video.setDescription(rs.getString("description"));
+	            video.setImg(rs.getString("img"));
+	            video.setCreateAt(rs.getTimestamp("create_at"));
+	            video.setStatus(rs.getString("status"));
+	            video.setPath(rs.getString("path"));
+	            video.setView(rs.getLong("view"));
+	            video.setAuthorName(rs.getString("author_name"));
+	            
+	            videos.add(video);
+	        }
+
+	    } catch (Exception e) {
+	        System.err.println("Lỗi khi lấy video trending!");
+	        e.printStackTrace();
+	    } finally {
+	        try {
+	            if (rs != null) rs.close();
+	            if (pstm != null) pstm.close();
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	    }
+	    return videos;
+	}
+
+	// ===== TĂNG VIEW COUNTER (CẢI TIẾN) =====
+	public void incrementView(int videoId) {
+	    try {
+	        if (conn == null)
+	            conn = ConnectDatabase.getMySQLConnection();
+
+	        String sql = "UPDATE video SET view = view + 1 WHERE video_id = ?";
+	        pstm = conn.prepareStatement(sql);
+	        pstm.setInt(1, videoId);
+	        pstm.executeUpdate();
+
+	    } catch (Exception e) {
+	        System.err.println("Lỗi khi tăng view!");
+	        e.printStackTrace();
+	    } finally {
+	        try {
+	            if (pstm != null) pstm.close();
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
 	    }
 	}
 
