@@ -2,9 +2,6 @@ package model.Bean;
 
 import java.sql.Timestamp;
 
-/**
- * Video Bean - Đại diện cho bảng video trong database
- */
 public class Video {
     private int videoId;
     private int authorId;
@@ -16,7 +13,7 @@ public class Video {
     private String path;
     private long view;
 
-    // Constructor mặc định
+
     public Video() {
     }
 
@@ -34,7 +31,7 @@ public class Video {
         this.view = view;
     }
 
-    // Constructor cho upload video mới (không có videoId)
+ 
     public Video(int authorId, String title, String description, String img,
             String status, String path) {
         this.authorId = authorId;
@@ -46,7 +43,6 @@ public class Video {
         this.view = 0;
     }
 
-    // Getters và Setters
     public int getVideoId() {
         return videoId;
     }

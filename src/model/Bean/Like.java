@@ -9,14 +9,14 @@ public class Like {
     private int likeId;
     private int videoId;
     private int userId;
-    private String type; // like, dislike
+    private String type; 
     private Timestamp createAt;
 
   
     public Like() {
     }
 
-    // Constructor đầy đủ
+
     public Like(int likeId, int videoId, int userId, String type, Timestamp createAt) {
         this.likeId = likeId;
         this.videoId = videoId;
@@ -25,14 +25,14 @@ public class Like {
         this.createAt = createAt;
     }
 
-    // Constructor cho thêm like mới (không có likeId)
+   
     public Like(int videoId, int userId, String type) {
         this.videoId = videoId;
         this.userId = userId;
         this.type = type;
     }
 
-    // Getters và Setters
+
     public int getLikeId() {
         return likeId;
     }

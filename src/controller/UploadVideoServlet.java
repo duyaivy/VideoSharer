@@ -14,18 +14,16 @@ import javax.servlet.http.Part;
 
 import helpers.ViewPath;
 
-
-
 @WebServlet("/upload-video")
 @MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2, // 2MB
 		maxFileSize = 1024 * 1024 * 100, maxRequestSize = 1024 * 1024 * 100)
 public class UploadVideoServlet extends HttpServlet {
 
-	private static final String UPLOAD_DIR = "uploads";
-	private static final String ORIGINAL_DIR = "original";
-	private static final String THUMBNAIL_DIR = "thumbnails";
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
-	// Các định dạng video được phép
 	private static final String[] ALLOWED_EXTENSIONS = { ".mp4", ".avi", ".mov", ".mkv", ".flv", ".wmv" };
 
 	private static final long MAX_FILE_SIZE = 100 * 1024 * 1024;
@@ -33,14 +31,16 @@ public class UploadVideoServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// Hiển thị form upload
 		doPost(request, response);
 	}
 
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
+		request.setCharacterEncoding("UTF-8");
+	    response.setContentType("text/html; charset=UTF-8");
+	    response.setCharacterEncoding("UTF-8");
+		
 		// hard_code
 		int authorId = 1;
 
@@ -49,7 +49,7 @@ public class UploadVideoServlet extends HttpServlet {
 			String title = request.getParameter("title");
 			String description = request.getParameter("description");
 			Part filePart = request.getPart("videoFile");
-		
+
 			String fileName = getFileName(filePart);
 			String fileExtension = getFileExtension(fileName);
 
@@ -68,21 +68,20 @@ public class UploadVideoServlet extends HttpServlet {
 			}
 
 			boolean isDone = videoBO.getInstance().uploadVideo(authorId, title, description, filePart);
-			if(isDone) {
+			if (isDone) {
 				request.setAttribute("author_id", authorId);
 				request.getRequestDispatcher(ViewPath.resolve("ManageVideo")).forward(request, response);
 				return;
 			}
-			
+
 			request.setAttribute("error", "Co loi trong luc tai file");
-			request.getRequestDispatcher(ViewPath.resolve("UploadVideo")).forward(request, response);	
+			request.getRequestDispatcher(ViewPath.resolve("UploadVideo")).forward(request, response);
 		} catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("error", "Lỗi khi upload video: " + e.getMessage());
 			request.getRequestDispatcher(ViewPath.resolve("UploadVideo")).forward(request, response);
 		}
 	}
-
 
 	private String getFileName(Part part) {
 		String contentDisposition = part.getHeader("content-disposition");
@@ -97,7 +96,6 @@ public class UploadVideoServlet extends HttpServlet {
 		return "";
 	}
 
-	
 	private String getFileExtension(String fileName) {
 		int lastDot = fileName.lastIndexOf('.');
 		if (lastDot > 0) {
@@ -106,7 +104,6 @@ public class UploadVideoServlet extends HttpServlet {
 		return "";
 	}
 
-	
 	private boolean isValidExtension(String extension) {
 		for (String allowed : ALLOWED_EXTENSIONS) {
 			if (allowed.equals(extension)) {
@@ -116,6 +113,4 @@ public class UploadVideoServlet extends HttpServlet {
 		return false;
 	}
 
-	
-	
 }
