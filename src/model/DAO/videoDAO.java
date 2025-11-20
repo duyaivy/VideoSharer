@@ -7,6 +7,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.ArrayList;
+import java.util.List;
 
 import model.Bean.Video;
 
@@ -60,7 +62,7 @@ public class videoDAO {
 
 				rs = pstm.executeQuery();
 				if (rs.next()) {
-					
+
 					Video video = new Video();
 					video.setVideoId(rs.getInt("video_id"));
 					video.setAuthorId(rs.getInt("author_id"));
@@ -175,7 +177,8 @@ public class videoDAO {
 					video.setCreateAt(rs.getTimestamp("create_at"));
 					video.setStatus(rs.getString("status"));
 					video.setView(rs.getLong("view"));
-					if (!video.getStatus().equals("done")) continue;
+					if (!video.getStatus().equals("done"))
+						continue;
 					ls.add(video);
 				}
 			}
@@ -186,4 +189,112 @@ public class videoDAO {
 		}
 		return ls;
 	}
+
+	public List<Video> getLatestVideos(int limit) {
+		List<Video> videos = new ArrayList<>();
+		Connection conn = null;
+		PreparedStatement pstm = null;
+		ResultSet rs = null;
+
+		try {
+			conn = ConnectDatabase.getMySQLConnection();
+			String sql = "SELECT v.*, u.name as author_name " +
+					"FROM video v " +
+					"JOIN user u ON v.author_id = u.id " +
+					"WHERE v.status IN ('ready', 'done', 'pending', 'processing') " + // ⭐ SỬA DÒNG NÀY
+					"ORDER BY v.create_at DESC " +
+					"LIMIT ?";
+
+			System.out.println("✅ videoDAO: Executing query...");
+			pstm = conn.prepareStatement(sql);
+			pstm.setInt(1, limit);
+			rs = pstm.executeQuery();
+
+			int count = 0;
+			while (rs.next()) {
+				Video video = new Video();
+				video.setVideoId(rs.getInt("video_id"));
+				video.setAuthorId(rs.getInt("author_id"));
+				video.setTitle(rs.getString("title"));
+				video.setDescription(rs.getString("description"));
+				video.setImg(rs.getString("img"));
+				video.setCreateAt(rs.getTimestamp("create_at"));
+				video.setStatus(rs.getString("status"));
+				video.setPath(rs.getString("path"));
+				video.setView(rs.getLong("view"));
+				video.setAuthorName(rs.getString("author_name"));
+
+				videos.add(video);
+				count++;
+			}
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+				if (pstm != null)
+					pstm.close();
+				if (conn != null)
+					conn.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		return videos;
+	}
+
+	public List<Video> getTrendingVideos(int limit) {
+		List<Video> videos = new ArrayList<>();
+		try {
+			if (conn == null)
+				conn = ConnectDatabase.getMySQLConnection();
+
+			String sql = "SELECT v.*, u.name as author_name " +
+					"FROM video v " +
+					"JOIN user u ON v.author_id = u.id " +
+					"WHERE v.IN ('ready', 'done', 'pending', 'processing') " +
+					"ORDER BY v.view DESC " +
+					"LIMIT ?";
+
+			pstm = conn.prepareStatement(sql);
+			pstm.setInt(1, limit);
+			rs = pstm.executeQuery();
+
+			while (rs.next()) {
+				Video video = new Video();
+				video.setVideoId(rs.getInt("video_id"));
+				video.setAuthorId(rs.getInt("author_id"));
+				video.setTitle(rs.getString("title"));
+				video.setDescription(rs.getString("description"));
+				video.setImg(rs.getString("img"));
+				video.setCreateAt(rs.getTimestamp("create_at"));
+				video.setStatus(rs.getString("status"));
+				video.setPath(rs.getString("path"));
+				video.setView(rs.getLong("view"));
+				video.setAuthorName(rs.getString("author_name"));
+
+				videos.add(video);
+			}
+
+		} catch (Exception e) {
+			System.err.println("Lỗi khi lấy video trending!");
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+				if (pstm != null)
+					pstm.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return videos;
+	}
+
+	
 }

@@ -2,9 +2,7 @@ package model.Bean;
 
 import java.sql.Timestamp;
 
-/**
- * User Bean - Đại diện cho bảng user trong database
- */
+
 public class User {
     private int id;
     private String name;

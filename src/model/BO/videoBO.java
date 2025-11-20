@@ -12,6 +12,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
+import javax.servlet.http.Part;
+
 public class videoBO {
 	videoDAO dao;
 	static videoBO bo = null;
@@ -24,7 +26,6 @@ public class videoBO {
 
 		Video vd = dao.createVideo(authorId, title, des);
 		if (vd == null) {
-			System.out.println("❌ Failed to create video in DB");
 			return false;
 		}
 
