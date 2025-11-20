@@ -27,25 +27,13 @@ public class ManageVideoServlet extends HttpServlet {
 		// 1. Lấy user từ session (giả sử bạn lưu là "user")
 		HttpSession session = request.getSession(false);
 		User user = (session != null) ? (User) session.getAttribute("user") : null;
-		int authorId;
-//		if (user == null) {
-//			// Chưa login -> chuyển về login
-//			response.sendRedirect(request.getContextPath() + "/login");
-//			return;
-//		}
-//
-//		authorId = user.getId();
-
 		if (user == null) {
-			// ===========================
-			// DEV ONLY – CHO TASK 2
-			// Không đụng Task 1, dùng tạm authorId = 1
-			// SAU NÀY NHỚ XÓA ĐOẠN NÀY hoặc trả lại redirect
-			// ===========================
-			authorId = 1; // lấy video của user có id = 1 trong DB
-		} else {
-			authorId = user.getId();
+			response.sendRedirect(request.getContextPath() + "/login");
+			return;
 		}
+
+		int authorId = user.getId();
+
 		// 2. Lấy param page
 		int page = 1;
 		String pageParam = request.getParameter("page");

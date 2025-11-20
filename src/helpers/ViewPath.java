@@ -4,16 +4,18 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class ViewPath {
-<<<<<<< HEAD
-	private static final String PREFIX = "/";
-	private static final String SUFFIX = ".jsp";
+
+	private static final String PREFIX_JSP = "/";
+	private static final String SUFFIX_JSP = ".jsp";
+
+	private static final String PREFIX_JAVA = "/VideoSharer/";
 
 	public static String resolve(String viewName) {
-		return PREFIX + viewName + SUFFIX;
+		return PREFIX_JSP + viewName + SUFFIX_JSP;
 	}
 
 	public static Path getOriginalPath() {
-		String projectPath = "F:\\App Downloads\\sts-4.27.0.RELEASE\\VideoSharer";
+		String projectPath = "F:\\\\App Downloads\\sts-4.27.0.RELEASE\\VideoSharer";
 		Path uploadBase = Paths.get(projectPath, "WebContent", "uploads", "original");
 		return uploadBase;
 	}
@@ -23,29 +25,9 @@ public class ViewPath {
 		Path uploadBase = Paths.get(projectPath, "WebContent", "uploads", "hls");
 		return uploadBase;
 	}
-}
-=======
-    private static final String PREFIX_JSP = "/";
-    private static final String SUFFIX_JSP = ".jsp";
 
-    private static final String PREFIX_JAVA = "/VideoSharer/";
-   
-    public static String resolve(String viewName) {
-        return PREFIX_JSP + viewName + SUFFIX_JSP;
-    }
-    public static Path getOriginalPath() {
-    	String projectPath = "D:\\HOCKY4\\LapTrinhMang\\BaiTapNhom"; 
-        Path uploadBase = Paths.get(projectPath, "WebContent", "uploads", "original");
-        return uploadBase;
-    }
-    public static Path getHlsPath() {
-    	String projectPath = "D:\\HOCKY4\\LapTrinhMang\\BaiTapNhom"; 
-        Path uploadBase = Paths.get(projectPath, "WebContent", "uploads", "hls");
-        return uploadBase;
-    }
-    public static String getWatchLink(int id) {
-    	String idString = Integer.toString(id);
-    	 return PREFIX_JAVA + "watch?id=" + idString;
-    }
-}	
->>>>>>> 1ed4c01b696f0b2763a145417637bc3a83a5b0b2
+	public static String getWatchLink(int id) {
+		String idString = Integer.toString(id);
+		return PREFIX_JAVA + "watch?id=" + idString;
+	}
+}

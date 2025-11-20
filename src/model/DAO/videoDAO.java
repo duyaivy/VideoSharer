@@ -25,8 +25,7 @@ public class videoDAO {
 		String sql = "INSERT INTO video (author_id, title, description) VALUES (?, ?, ?)";
 		try {
 			conn = ConnectDatabase.getMySQLConnection();
-			try (PreparedStatement pstm = (PreparedStatement) conn.prepareStatement(sql,
-					Statement.RETURN_GENERATED_KEYS)) {
+			try (PreparedStatement pstm = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 				pstm.setInt(1, authorId);
 				pstm.setString(2, title);
 				pstm.setString(3, des);
@@ -41,7 +40,6 @@ public class videoDAO {
 					newId = rs.getInt(1);
 				}
 				return this.getVideoByID(newId);
-
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -54,12 +52,10 @@ public class videoDAO {
 		String sql = "SELECT * FROM video WHERE video_id = ?";
 		try {
 			conn = ConnectDatabase.getMySQLConnection();
-			try (PreparedStatement pstm = (PreparedStatement) conn.prepareStatement(sql)) {
+			try (PreparedStatement pstm = conn.prepareStatement(sql)) {
 				pstm.setInt(1, id);
-
 				rs = pstm.executeQuery();
 				if (rs.next()) {
-
 					Video video = new Video();
 					video.setVideoId(rs.getInt("video_id"));
 					video.setAuthorId(rs.getInt("author_id"));
@@ -80,12 +76,11 @@ public class videoDAO {
 		}
 	}
 
-	// --- Nhung: cập nhật view trực tiếp theo giá trị truyền vào
 	public boolean updateView(int videoId, long view) {
 		String sql = "UPDATE video SET view = ? WHERE video_id = ?";
 
 		try (Connection conn = ConnectDatabase.getMySQLConnection();
-				PreparedStatement pstm = (PreparedStatement) conn.prepareStatement(sql)) {
+				PreparedStatement pstm = conn.prepareStatement(sql)) {
 
 			pstm.setLong(1, view);
 			pstm.setInt(2, videoId);
@@ -98,12 +93,11 @@ public class videoDAO {
 		}
 	}
 
-	// --- Nhánh kia: tăng view lên 1
 	public boolean incrementView(int videoId) {
 		String sql = "UPDATE video SET view = view + 1 WHERE video_id = ?";
 
 		try (Connection conn = ConnectDatabase.getMySQLConnection();
-				PreparedStatement pstm = (PreparedStatement) conn.prepareStatement(sql)) {
+				PreparedStatement pstm = conn.prepareStatement(sql)) {
 
 			pstm.setInt(1, videoId);
 
@@ -119,7 +113,7 @@ public class videoDAO {
 		String sql = "UPDATE video SET path = ?, img = ? WHERE video_id = ?";
 
 		try (Connection conn = ConnectDatabase.getMySQLConnection();
-				PreparedStatement pstm = (PreparedStatement) conn.prepareStatement(sql)) {
+				PreparedStatement pstm = conn.prepareStatement(sql)) {
 
 			pstm.setString(1, path);
 			pstm.setString(2, img);
@@ -137,7 +131,7 @@ public class videoDAO {
 		String sql = "UPDATE video SET title = ?, description = ?, status = ? WHERE video_id = ?";
 
 		try (Connection conn = ConnectDatabase.getMySQLConnection();
-				PreparedStatement pstm = (PreparedStatement) conn.prepareStatement(sql)) {
+				PreparedStatement pstm = conn.prepareStatement(sql)) {
 
 			pstm.setString(1, title);
 			pstm.setString(2, description);
@@ -156,7 +150,7 @@ public class videoDAO {
 		String sql = "UPDATE video SET status = ? WHERE video_id = ?";
 
 		try (Connection conn = ConnectDatabase.getMySQLConnection();
-				PreparedStatement pstm = (PreparedStatement) conn.prepareStatement(sql)) {
+				PreparedStatement pstm = conn.prepareStatement(sql)) {
 
 			pstm.setString(1, status);
 			pstm.setInt(2, videoId);
@@ -169,13 +163,11 @@ public class videoDAO {
 		}
 	}
 
-	// ----------------- Nhung -----------------
-
-	// Đếm tổng số video của 1 author
+	// Đếm tổng số video của 1 author (không tính video đã xoá)
 	public int countByAuthor(int authorId) {
-		String sql = "SELECT COUNT(*) FROM video WHERE author_id = ?";
+		String sql = "SELECT COUNT(*) FROM video WHERE author_id = ? AND is_delete = 0";
 		try (Connection conn = ConnectDatabase.getMySQLConnection();
-				PreparedStatement pstm = (PreparedStatement) conn.prepareStatement(sql)) {
+				PreparedStatement pstm = conn.prepareStatement(sql)) {
 
 			pstm.setInt(1, authorId);
 			try (ResultSet rs = pstm.executeQuery()) {
@@ -189,13 +181,14 @@ public class videoDAO {
 		return 0;
 	}
 
-	// Lấy list video theo author + phân trang
+	// Lấy list video theo author + phân trang (không tính video đã xoá)
 	public List<Video> getVideosByAuthor(int authorId, int offset, int limit) {
 		List<Video> list = new ArrayList<>();
-		String sql = "SELECT * FROM video WHERE author_id = ? " + "ORDER BY create_at DESC " + "LIMIT ? OFFSET ?";
+		String sql = "SELECT * FROM video " + "WHERE author_id = ? AND is_delete = 0 " + "ORDER BY create_at DESC "
+				+ "LIMIT ? OFFSET ?";
 
 		try (Connection conn = ConnectDatabase.getMySQLConnection();
-				PreparedStatement pstm = (PreparedStatement) conn.prepareStatement(sql)) {
+				PreparedStatement pstm = conn.prepareStatement(sql)) {
 
 			pstm.setInt(1, authorId);
 			pstm.setInt(2, limit);
@@ -223,16 +216,49 @@ public class videoDAO {
 		return list;
 	}
 
-	// ----------------- Trending (page, size) -----------------
+	// Chỉnh sửa title và description
+	public boolean updateVideoInfoBasic(int videoId, String title, String description) {
+		String sql = "UPDATE video SET title = ?, description = ? WHERE video_id = ?";
+
+		try (Connection conn = ConnectDatabase.getMySQLConnection();
+				PreparedStatement pstm = conn.prepareStatement(sql)) {
+
+			pstm.setString(1, title);
+			pstm.setString(2, description);
+			pstm.setInt(3, videoId);
+
+			return pstm.executeUpdate() > 0;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	// Xóa mềm
+	public boolean softDelete(int videoId, int authorId) {
+		String sql = "UPDATE video SET is_delete = 1 WHERE video_id = ? AND author_id = ?";
+		try (Connection conn = ConnectDatabase.getMySQLConnection();
+				PreparedStatement pstm = conn.prepareStatement(sql)) {
+
+			pstm.setInt(1, videoId);
+			pstm.setInt(2, authorId);
+			return pstm.executeUpdate() > 0;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	// Trending (page, size) – chỉ lấy video chưa xoá, đã done
 	public ArrayList<Video> getTrendingVideo(int page, int size) {
 		ArrayList<Video> ls = new ArrayList<>();
 
-		String sql = "SELECT * FROM video ORDER BY view DESC LIMIT ? OFFSET ?";
+		String sql = "SELECT * FROM video " + "WHERE is_delete = 0 " + "ORDER BY view DESC " + "LIMIT ? OFFSET ?";
 
 		try (Connection conn = ConnectDatabase.getMySQLConnection();
-				PreparedStatement pstm = (PreparedStatement) conn.prepareStatement(sql)) {
-			int offset = (page - 1) * size;
+				PreparedStatement pstm = conn.prepareStatement(sql)) {
 
+			int offset = (page - 1) * size;
 			pstm.setInt(1, size);
 			pstm.setInt(2, offset);
 
@@ -249,7 +275,6 @@ public class videoDAO {
 					video.setStatus(rs.getString("status"));
 					video.setView(rs.getLong("view"));
 
-					// Chỉ lấy video đã done (giống logic cũ)
 					if (!"done".equals(video.getStatus()))
 						continue;
 
@@ -274,8 +299,8 @@ public class videoDAO {
 		try {
 			conn = ConnectDatabase.getMySQLConnection();
 			String sql = "SELECT v.*, u.name as author_name " + "FROM video v " + "JOIN user u ON v.author_id = u.id "
-					+ "WHERE v.status IN ('ready', 'done', 'pending', 'processing') " + "ORDER BY v.create_at DESC "
-					+ "LIMIT ?";
+					+ "WHERE v.status IN ('ready','done','pending','processing') " + "AND v.is_delete = 0 "
+					+ "ORDER BY v.create_at DESC " + "LIMIT ?";
 
 			System.out.println("✅ videoDAO: Executing query...");
 			pstm = conn.prepareStatement(sql);
@@ -299,7 +324,6 @@ public class videoDAO {
 			}
 
 		} catch (Exception e) {
-
 			e.printStackTrace();
 		} finally {
 			try {
@@ -325,8 +349,8 @@ public class videoDAO {
 				conn = ConnectDatabase.getMySQLConnection();
 
 			String sql = "SELECT v.*, u.name as author_name " + "FROM video v " + "JOIN user u ON v.author_id = u.id "
-					+ "WHERE v.status IN ('ready', 'done', 'pending', 'processing') " + "ORDER BY v.view DESC "
-					+ "LIMIT ?";
+					+ "WHERE v.status IN ('ready', 'done', 'pending', 'processing') " + "AND v.is_delete = 0 "
+					+ "ORDER BY v.view DESC " + "LIMIT ?";
 
 			pstm = conn.prepareStatement(sql);
 			pstm.setInt(1, limit);
@@ -363,5 +387,4 @@ public class videoDAO {
 		}
 		return videos;
 	}
-
 }

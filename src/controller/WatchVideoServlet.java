@@ -8,6 +8,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import helpers.ViewPath;
 import model.BO.commentBO;
@@ -44,32 +45,50 @@ public class WatchVideoServlet extends HttpServlet {
 			return;
 		}
 
+		HttpSession session = request.getSession(false);
+		model.Bean.User user = (session != null) ? (model.Bean.User) session.getAttribute("user") : null;
+
+		if (user == null) {
+			response.sendRedirect(request.getContextPath() + "/login");
+			return;
+		}
+
+		int userId = user.getId();
+
 		try {
 			int videoId = Integer.parseInt(params);
-		
-			int page = 1; 
-			int size = 20;
-			
-			if (pageS != null && !pageS.isEmpty()) {
-	            try {
-	                page = Integer.parseInt(pageS);
-	            } catch (NumberFormatException ignore) {}
-	        }
 
-	        if (sizeS != null && !sizeS.isEmpty()) {
-	            try {
-	                size = Integer.parseInt(sizeS);
-	            } catch (NumberFormatException ignore) {}
-	        }
-	        
+			int page = 1;
+			int size = 20;
+
+			if (pageS != null && !pageS.isEmpty()) {
+				try {
+					page = Integer.parseInt(pageS);
+				} catch (NumberFormatException ignore) {
+				}
+			}
+
+			if (sizeS != null && !sizeS.isEmpty()) {
+				try {
+					size = Integer.parseInt(sizeS);
+				} catch (NumberFormatException ignore) {
+				}
+			}
+
 			Video vd = videoBO.getInstance().watchVideo(videoId);
-			ArrayList<Video> vdList = videoBO.getInstance().getVideoTrending(page,size);
-			
+			if (vd == null) {
+				request.setAttribute("message", "Video không tồn tại!");
+				request.getRequestDispatcher("/Error.jsp").forward(request, response);
+				return;
+			}
+
+			ArrayList<Video> vdList = videoBO.getInstance().getVideoTrending(page, size);
+
 			ArrayList<Comment> commentList = commentBO.getInstance().getCommentByVideoId(vd.getVideoId(), page, size);
-			
+
 			int likeCount = likeBO.getInstance().getLikeCountByVideoId(vd.getVideoId());
 			request.setAttribute("like_count", likeCount);
-			int disLikeCount = likeBO.getInstance().getLikeCountByVideoId(vd.getVideoId());
+			int disLikeCount = likeBO.getInstance().getDisLikeCountByVideoId(vd.getVideoId());
 			request.setAttribute("dislike_count", disLikeCount);
 			request.setAttribute("video", vd);
 			request.setAttribute("video_list", vdList);
@@ -77,7 +96,7 @@ public class WatchVideoServlet extends HttpServlet {
 			request.getRequestDispatcher(ViewPath.resolve("WatchVideo")).forward(request, response);
 
 		} catch (NumberFormatException e) {
-			request.setAttribute("message", "ID video không hợp lệ!"); 
+			request.setAttribute("message", "ID video không hợp lệ!");
 			request.getRequestDispatcher("/Error.jsp").forward(request, response);
 		}
 	}
