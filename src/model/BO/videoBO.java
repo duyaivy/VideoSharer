@@ -6,11 +6,11 @@ import helpers.ViewPath;
 import model.Bean.Video;
 import model.DAO.VideoQueueDAO;
 import model.DAO.videoDAO;
-import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 import javax.servlet.http.Part;
 
@@ -53,7 +53,7 @@ public class videoBO {
 
 			dao.updateVideoStatus(videoId, "processing");
 
-			// thumbnail
+		
 			String thumbFileName = "thumb.jpg";
 			Path thumbFile = videoDir.resolve(thumbFileName);
 
@@ -76,7 +76,7 @@ public class videoBO {
 			dao.updateVideoPath(videoId, relativeVideoPath, relativeImgPath);
 			
 			 
-	       // them vao queue
+	      
 	        VideoQueueDAO queueDAO = new VideoQueueDAO();
 	        boolean addedToQueue = queueDAO.addToQueue(videoId);
 	        
@@ -110,7 +110,9 @@ public class videoBO {
 			bo = new videoBO();
 		return bo;
 	}
-
+	public  ArrayList<Video> getVideoTrending(int page, int size){
+		return dao.getTrendingVideo(page, size);
+	}
 	private String getSubmittedFileName(Part part) {
 		if (part == null)
 			return null;
@@ -124,5 +126,17 @@ public class videoBO {
 			}
 		}
 		return null;
+	}
+
+	public Video getVideoById(int id) {
+	return dao.getVideoByID(id);
+	}
+	public Video watchVideo(int id) {
+		Video vd = dao.getVideoByID(id);
+		if(vd != null) {
+			dao.incrementView(id);
+			vd.setView(vd.getView() + 1);
+		}
+		return vd;
 	}
 }

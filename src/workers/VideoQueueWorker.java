@@ -18,7 +18,7 @@ public class VideoQueueWorker implements Runnable {
 
 	@Override
 	public void run() {
-		System.out.println("🚀 VideoEncodingWorker started!");
+		
 
 		VideoQueueDAO queueDAO = new VideoQueueDAO();
 		videoDAO vdDAO = new videoDAO();
