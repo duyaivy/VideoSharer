@@ -12,6 +12,14 @@ import helpers.ViewPath;
 import model.Bean.Video;
 import model.DAO.VideoQueueDAO;
 import model.DAO.videoDAO;
+<<<<<<< HEAD
+=======
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+>>>>>>> 1ed4c01b696f0b2763a145417637bc3a83a5b0b2
 
 public class videoBO {
 	videoDAO dao;
@@ -52,7 +60,7 @@ public class videoBO {
 
 			dao.updateVideoStatus(videoId, "processing");
 
-			// thumbnail
+		
 			String thumbFileName = "thumb.jpg";
 			Path thumbFile = videoDir.resolve(thumbFileName);
 
@@ -71,6 +79,7 @@ public class videoBO {
 					.replace("\\", "/");
 
 			dao.updateVideoPath(videoId, relativeVideoPath, relativeImgPath);
+<<<<<<< HEAD
 
 			// them vao queue
 			VideoQueueDAO queueDAO = new VideoQueueDAO();
@@ -86,6 +95,26 @@ public class videoBO {
 			}
 
 			return true;
+=======
+			
+			 
+	      
+	        VideoQueueDAO queueDAO = new VideoQueueDAO();
+	        boolean addedToQueue = queueDAO.addToQueue(videoId);
+	        
+	        if (addedToQueue) {
+	            System.out.println("✅ Video added to encoding queue: " + videoId);
+	            dao.updateVideoStatus(videoId, "pending"); 
+	        } else {
+	            System.err.println("❌ Failed to add to queue");
+	            dao.updateVideoStatus(videoId, "failed");
+	            return false;
+	        }
+	        
+	        return true;
+			
+			
+>>>>>>> 1ed4c01b696f0b2763a145417637bc3a83a5b0b2
 
 		} catch (Exception e) {
 
@@ -104,7 +133,9 @@ public class videoBO {
 			bo = new videoBO();
 		return bo;
 	}
-
+	public  ArrayList<Video> getVideoTrending(int page, int size){
+		return dao.getTrendingVideo(page, size);
+	}
 	private String getSubmittedFileName(Part part) {
 		if (part == null)
 			return null;
@@ -120,6 +151,7 @@ public class videoBO {
 		return null;
 	}
 
+<<<<<<< HEAD
 	// ------Nhung
 	// Đếm tổng số video của 1 author
 	public int countVideosByAuthor(int authorId) {
@@ -134,4 +166,17 @@ public class videoBO {
 		return dao.getVideosByAuthor(authorId, offset, pageSize);
 	}
 	// ----------Nhung------
+=======
+	public Video getVideoById(int id) {
+	return dao.getVideoByID(id);
+	}
+	public Video watchVideo(int id) {
+		Video vd = dao.getVideoByID(id);
+		if(vd != null) {
+			dao.incrementView(id);
+			vd.setView(vd.getView() + 1);
+		}
+		return vd;
+	}
+>>>>>>> 1ed4c01b696f0b2763a145417637bc3a83a5b0b2
 }

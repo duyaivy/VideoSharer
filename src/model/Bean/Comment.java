@@ -2,16 +2,16 @@ package model.Bean;
 
 import java.sql.Timestamp;
 
-/**
- * Comment Bean - Đại diện cho bảng comment trong database
- */
 public class Comment {
     private int commentId;
     private int videoId;
-    private int userId;
+    private int UserId;
     private String message;
     private Timestamp createAt;
+    
+    private String userName;
 
+    private String userEmail;
     // Constructor mặc định
     public Comment() {
     }
@@ -21,19 +21,19 @@ public class Comment {
             String message, Timestamp createAt) {
         this.commentId = commentId;
         this.videoId = videoId;
-        this.userId = userId;
+        this.UserId = userId;
         this.message = message;
         this.createAt = createAt;
     }
 
-    // Constructor cho thêm comment mới (không có commentId)
+   
     public Comment(int videoId, int userId, String message) {
         this.videoId = videoId;
-        this.userId = userId;
+        this.UserId = userId;
         this.message = message;
     }
 
-    // Getters và Setters
+    
     public int getCommentId() {
         return commentId;
     }
@@ -51,11 +51,25 @@ public class Comment {
     }
 
     public int getUserId() {
-        return userId;
+        return UserId;
     }
 
     public void setUserId(int userId) {
-        this.userId = userId;
+        this.UserId = userId;
+    }
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String n) {
+        this.userName = n;
+    }
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public void setUserEmail(String e) {
+        this.userEmail = e;
     }
 
     public String getMessage() {
@@ -74,7 +88,6 @@ public class Comment {
         this.createAt = createAt;
     }
 
-    // Method tiện ích
     public boolean isEmpty() {
         return message == null || message.trim().isEmpty();
     }
@@ -83,14 +96,4 @@ public class Comment {
         return message != null ? message.length() : 0;
     }
 
-    @Override
-    public String toString() {
-        return "Comment{" +
-                "commentId=" + commentId +
-                ", videoId=" + videoId +
-                ", userId=" + userId +
-                ", message='" + message + '\'' +
-                ", createAt=" + createAt +
-                '}';
-    }
 }

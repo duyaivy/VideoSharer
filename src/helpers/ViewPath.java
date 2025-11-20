@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class ViewPath {
+<<<<<<< HEAD
 	private static final String PREFIX = "/";
 	private static final String SUFFIX = ".jsp";
 
@@ -23,3 +24,28 @@ public class ViewPath {
 		return uploadBase;
 	}
 }
+=======
+    private static final String PREFIX_JSP = "/";
+    private static final String SUFFIX_JSP = ".jsp";
+
+    private static final String PREFIX_JAVA = "/VideoSharer/";
+   
+    public static String resolve(String viewName) {
+        return PREFIX_JSP + viewName + SUFFIX_JSP;
+    }
+    public static Path getOriginalPath() {
+    	String projectPath = "D:/ECLIPSE2020/VideoSharer"; 
+        Path uploadBase = Paths.get(projectPath, "WebContent", "uploads", "original");
+        return uploadBase;
+    }
+    public static Path getHlsPath() {
+    	String projectPath = "D:/ECLIPSE2020/VideoSharer"; 
+        Path uploadBase = Paths.get(projectPath, "WebContent", "uploads", "hls");
+        return uploadBase;
+    }
+    public static String getWatchLink(int id) {
+    	String idString = Integer.toString(id);
+    	 return PREFIX_JAVA + "watch?id=" + idString;
+    }
+}	
+>>>>>>> 1ed4c01b696f0b2763a145417637bc3a83a5b0b2

@@ -6,7 +6,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+<<<<<<< HEAD
 import java.util.List;
+=======
+>>>>>>> 1ed4c01b696f0b2763a145417637bc3a83a5b0b2
 
 import model.Bean.Video;
 
@@ -60,6 +63,7 @@ public class videoDAO {
 
 				rs = pstm.executeQuery();
 				if (rs.next()) {
+					
 					Video video = new Video();
 					video.setVideoId(rs.getInt("video_id"));
 					video.setAuthorId(rs.getInt("author_id"));
@@ -79,6 +83,7 @@ public class videoDAO {
 			return null;
 		}
 	}
+<<<<<<< HEAD
 
 	public boolean updateView(int videoId, long view) {
 		String sql = "UPDATE video SET view = ? WHERE video_id = ?";
@@ -91,6 +96,19 @@ public class videoDAO {
 
 			return pstm.executeUpdate() > 0;
 
+=======
+
+	public boolean incrementView(int videoId) {
+		String sql = "UPDATE video SET view = view +1 WHERE video_id = ?";
+
+		try (Connection conn = ConnectDatabase.getMySQLConnection();
+				PreparedStatement pstm = (PreparedStatement) conn.prepareStatement(sql)) {
+
+			pstm.setInt(1, videoId);
+
+			return pstm.executeUpdate() > 0;
+
+>>>>>>> 1ed4c01b696f0b2763a145417637bc3a83a5b0b2
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
@@ -151,6 +169,7 @@ public class videoDAO {
 		}
 	}
 
+<<<<<<< HEAD
 //-----------------Nhung ---------------
 
 //Đếm tổng số video của 1 author
@@ -182,6 +201,19 @@ public class videoDAO {
 			pstm.setInt(1, authorId);
 			pstm.setInt(2, limit);
 			pstm.setInt(3, offset);
+=======
+	public ArrayList<Video> getTrendingVideo(int page, int size) {
+		ArrayList<Video> ls = new ArrayList<>();
+
+		String sql = "Select * from video order by view DESC LIMIT ?  offset ?";
+
+		try (Connection conn = ConnectDatabase.getMySQLConnection();
+				PreparedStatement pstm = (PreparedStatement) conn.prepareStatement(sql)) {
+			int offset = (page - 1) * size;
+
+			pstm.setInt(1, size);
+			pstm.setInt(2, offset);
+>>>>>>> 1ed4c01b696f0b2763a145417637bc3a83a5b0b2
 
 			try (ResultSet rs = pstm.executeQuery()) {
 				while (rs.next()) {
@@ -193,6 +225,7 @@ public class videoDAO {
 					video.setTitle(rs.getString("title"));
 					video.setDescription(rs.getString("description"));
 					video.setCreateAt(rs.getTimestamp("create_at"));
+<<<<<<< HEAD
 					// nếu trong bảng có các cột khác như status, view thì set thêm:
 					// video.setStatus(rs.getString("status"));
 					// video.setView(rs.getLong("view"));
@@ -208,3 +241,19 @@ public class videoDAO {
 	}
 //----------------------------Nhung ----------------
 }
+=======
+					video.setStatus(rs.getString("status"));
+					video.setView(rs.getLong("view"));
+					if (!video.getStatus().equals("done")) continue;
+					ls.add(video);
+				}
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ls;
+		}
+		return ls;
+	}
+}
+>>>>>>> 1ed4c01b696f0b2763a145417637bc3a83a5b0b2
