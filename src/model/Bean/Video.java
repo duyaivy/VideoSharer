@@ -12,7 +12,7 @@ public class Video {
     private String status; // pending, processing, ready, failed
     private String path;
     private long view;
-
+    private String authorName;
 
     public Video() {
     }
@@ -31,7 +31,6 @@ public class Video {
         this.view = view;
     }
 
- 
     public Video(int authorId, String title, String description, String img,
             String status, String path) {
         this.authorId = authorId;
@@ -113,6 +112,14 @@ public class Video {
 
     public void setView(long view) {
         this.view = view;
+    }
+
+    public String getAuthorName() {
+        return authorName;
+    }
+
+    public void setAuthorName(String authorName) {
+        this.authorName = authorName;
     }
 
     // Method tiện ích

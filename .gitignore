@@ -25,6 +25,7 @@ Thumbs.db
 *.class
 *.jar
 !WebContent/WEB-INF/lib/mysql-connector-j-8.0.33.jar
+!WebContent/WEB-INF/lib/jbcrypt-0.4.jar
 *.iml
 
 ### Tomcat work directories ###
