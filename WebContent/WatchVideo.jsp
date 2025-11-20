@@ -10,11 +10,11 @@ if (video == null) {
 	response.sendRedirect(request.getContextPath() + ViewPath.resolve("Login"));
 	return;
 }
-if (!video.getStatus().equals("done")) {
-	request.setAttribute("err", "Video bạn truy cập đang trong quá trình xử lý hoạc bị lỗi!");
-	request.getRequestDispatcher(ViewPath.resolve("Error")).forward(request, response);
-	return;
-}
+//if (!video.getStatus().equals("done")) {
+//	request.setAttribute("err", "Video bạn truy cập đang trong quá trình xử lý hoạc bị lỗi!");
+//	request.getRequestDispatcher(ViewPath.resolve("Error")).forward(request, response);
+//	return;
+//}
 String videoUrl = request.getContextPath() + "/" + video.getPath();
 int user_id = 1;
 Integer likeCount = (Integer) request.getAttribute("like_count");
@@ -432,13 +432,25 @@ body {
 
 		<div class="main-content">
 			<div class="video-wrapper">
-				<video id="videoPlayer"
-					class="video-js vjs-big-play-centered video-player" controls
-					preload="auto"
-					poster="<%=video.getImg() != null ? request.getContextPath() + "/" + video.getImg() : ""%>">
-					<source src="<%=videoUrl%>" type="application/x-mpegURL">
-				</video>
+			    <% if (!video.getStatus().equals("done")) { %>
+			        <div id="processing-msg" class="video-processing-msg">
+ 			           Video đang được xử lý, vui lòng đợi...
+    			    </div>
+   				     <video id="videoPlayer"
+  		             class="video-js vjs-big-play-centered video-player"
+  		             controls preload="auto"
+ 		              style="display:none;">
+ 			       </video>
+			    <% } else { %>    
+ 			       <video id="videoPlayer"
+ 			           class="video-js vjs-big-play-centered video-player" controls
+       				     preload="auto"
+       				     poster="<%=video.getImg() != null ? request.getContextPath() + "/" + video.getImg() : ""%>">
+      			      	<source src="<%=videoUrl%>" type="application/x-mpegURL">
+        			</video>
+    			<% } %>
 			</div>
+
 
 			<div class="video-info">
 				<h1 class="video-title"><%=video.getTitle()%></h1>
@@ -694,6 +706,8 @@ function handleClickDislike(e) {
     
     return false;
 }
+const videoId = <%=video.getVideoId()%>;
+const ctx = "<%=request.getContextPath()%>";
 
 var player = videojs('videoPlayer', {
     controls: true,
@@ -716,7 +730,47 @@ player.ready(function() {
     player.hlsQualitySelector({
         displayCurrentQuality: true
     });
+ // Chỉ bật realtime nếu video chưa done
+    <% if (!video.getStatus().equals("done")) { %>
+
+    const ws = new WebSocket("ws://localhost:8080/VideoSharer/video-status");
+
+    ws.onmessage = function(e){
+        const data = JSON.parse(e.data);
+
+        if (data.videoId !== videoId) return;
+
+        if (data.status === "done") {
+
+            const msg = document.getElementById("processing-msg");
+            if (msg) msg.style.display = "none";
+
+            const vp = document.getElementById("videoPlayer");
+            vp.style.display = "block";
+
+            player.src({
+                src: ctx + "/<%=video.getPath()%>",
+                type: "application/x-mpegURL"
+            });
+
+            player.play();
+        }
+    };
+
+    <% } %>
+
 });
 </script>
+<div id="toast" class="toast"></div>
+
+<script>
+function showToast(msg){
+    const t = document.getElementById("toast");
+    t.innerText = msg;
+    t.classList.add("show");
+    setTimeout(()=>t.classList.remove("show"), 3000);
+}
+</script>
+
 </body>
 </html>
