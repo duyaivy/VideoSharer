@@ -63,15 +63,14 @@ if (videos == null)
 			<a href="${pageContext.request.contextPath}/home" class="nav-item">
 				<span>🏠</span> <span>Trang chủ</span>
 			</a> <a href="${pageContext.request.contextPath}/trending"
-				class="nav-item"> <span>🔥</span> <span>Xu
-					hướng</span>
+				class="nav-item"> <span>🔥</span> <span>Xu hướng</span>
 			</a>
 			<hr />
 			<a href="${pageContext.request.contextPath}/manage-video"
-				class="nav-item active"> <span>📹</span> <span>Video
-					của tôi</span>
-			</a> <a href="${pageContext.request.contextPath}/liked" class="nav-item">
-				<span>👍</span> <span>Video đã thích</span>
+				class="nav-item"> <span>📹</span> <span>Video của tôi</span>
+			</a> <a href="${pageContext.request.contextPath}/profile"
+				class="nav-item"> <span>🙍‍♂️ </span> <span>Thông tin cá
+					nhân</span>
 			</a>
 		</nav>
 	</aside>
@@ -137,12 +136,10 @@ if (videos == null)
 								<td class="cell-thumb">
 									<%
 									if (v.getImg() != null && !v.getImg().isEmpty()) {
-									%> <img
-									src="<%=request.getContextPath()%>/<%=v.getImg()%>"
-									alt="thumbnail" class="thumb-img" />
-									<%
-									}
-									%>
+									%> <img src="<%=request.getContextPath()%>/<%=v.getImg()%>"
+									alt="thumbnail" class="thumb-img" /> <%
+ }
+ %>
 								</td>
 
 								<td class="cell-title">
@@ -158,21 +155,17 @@ if (videos == null)
 								<td class="cell-date"><%=v.getCreateAt()%></td>
 
 								<td class="cell-status"><span
-									id="status-<%=v.getVideoId()%>" class="status-badge">
-										<%=v.getStatus()%>
+									id="status-<%=v.getVideoId()%>" class="status-badge"> <%=v.getStatus()%>
 								</span></td>
 
 								<td class="cell-actions"><a
 									href="<%=request.getContextPath()%>/watch?id=<%=v.getVideoId()%>"
-									class="action-link"> Xem </a> <span
-									class="divider">•</span> <a
+									class="action-link"> Xem </a> <span class="divider">•</span> <a
 									href="<%=request.getContextPath()%>/edit-video?id=<%=v.getVideoId()%>"
-									class="action-link"> Sửa </a> <span
-									class="divider">•</span> <a
+									class="action-link"> Sửa </a> <span class="divider">•</span> <a
 									href="<%=request.getContextPath()%>/delete-video?id=<%=v.getVideoId()%>"
 									class="action-link action-link-danger"
-									onclick="return confirm('Xoá video này?')">
-										Xoá </a></td>
+									onclick="return confirm('Xoá video này?')"> Xoá </a></td>
 							</tr>
 							<%
 							}
@@ -208,8 +201,7 @@ if (videos == null)
 							<%
 							} else {
 							%>
-							<a
-								href="<%=request.getContextPath()%>/manage-video?page=<%=i%>"
+							<a href="<%=request.getContextPath()%>/manage-video?page=<%=i%>"
 								class="page-number"> <%=i%>
 							</a>
 							<%
@@ -237,8 +229,8 @@ if (videos == null)
 				<%
 				}
 				%>
-				</div>
 			</div>
+		</div>
 		</div>
 	</main>
 

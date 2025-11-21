@@ -16,7 +16,7 @@ out/
 
 ### Logs ###
 *.log
-
+.env
 ### OS-specific ###
 .DS_Store
 Thumbs.db
@@ -27,6 +27,7 @@ Thumbs.db
 !WebContent/WEB-INF/lib/mysql-connector-j-8.0.33.jar
 !WebContent/WEB-INF/lib/jbcrypt-0.4.jar
 !WebContent/WEB-INF/lib/gson-2.10.1.jar
+!WebContent/WEB-INF/lib/java-dotenv-3.1.5.jar
 *.iml
 
 ### Tomcat work directories ###

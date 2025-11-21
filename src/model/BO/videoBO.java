@@ -10,7 +10,7 @@ import java.util.List;
 import javax.servlet.http.Part;
 
 import helpers.Ffmpeg;
-import helpers.ViewPath;
+import helpers.PathHelper;
 import model.Bean.Video;
 import model.DAO.VideoQueueDAO;
 import model.DAO.videoDAO;
@@ -31,7 +31,7 @@ public class videoBO {
 		}
 
 		int videoId = vd.getVideoId();
-		Path videoDir = ViewPath.getOriginalPath().resolve("video_" + videoId);
+		Path videoDir = PathHelper.getOriginalPath().resolve("video_" + videoId);
 
 		try {
 

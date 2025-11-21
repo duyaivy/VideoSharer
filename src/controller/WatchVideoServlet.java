@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 
-import helpers.ViewPath;
+import helpers.PathHelper;
 import model.BO.commentBO;
 import model.BO.likeBO;
 import model.BO.videoBO;
@@ -41,7 +41,7 @@ public class WatchVideoServlet extends HttpServlet {
 		String pageS = request.getParameter("page");
 		String sizeS = request.getParameter("size");
 		if (params == null || params.isEmpty()) {
-			response.sendRedirect(request.getContextPath() + ViewPath.resolve("Login"));
+			response.sendRedirect(request.getContextPath() + PathHelper.resolve("Login"));
 			return;
 		}
 
@@ -86,7 +86,7 @@ public class WatchVideoServlet extends HttpServlet {
 			request.setAttribute("video", vd);
 			request.setAttribute("video_list", vdList);
 			request.setAttribute("comment_list", commentList);
-			request.getRequestDispatcher(ViewPath.resolve("WatchVideo")).forward(request, response);
+			request.getRequestDispatcher(PathHelper.resolve("WatchVideo")).forward(request, response);
 
 		} catch (NumberFormatException e) {
 			request.setAttribute("message", "ID video không hợp lệ!");

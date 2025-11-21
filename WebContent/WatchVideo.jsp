@@ -1,7 +1,7 @@
 <%@page import="model.Bean.User"%>
 <%@page import="model.Bean.Comment"%>
 <%@page import="java.util.ArrayList"%>
-<%@page import="helpers.ViewPath"%>
+<%@page import="helpers.PathHelper"%>
 <%@page import="model.Bean.Video"%>
 <%@page import="model.Bean.User"%>
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
@@ -9,12 +9,12 @@
 <%
 Video video = (Video) request.getAttribute("video");
 if (video == null) {
-	response.sendRedirect(request.getContextPath() + ViewPath.resolve("Login"));
+	response.sendRedirect(request.getContextPath() + PathHelper.resolve("Login"));
 	return;
 }
 if (!video.getStatus().equals("done")) {
 	request.setAttribute("err", "Video bạn truy cập đang trong quá trình xử lý hoặc bị lỗi!");
-	request.getRequestDispatcher(ViewPath.resolve("Error")).forward(request, response);
+	request.getRequestDispatcher(PathHelper.resolve("Error")).forward(request, response);
 	return;
 }
 
@@ -758,7 +758,7 @@ to {
 					<%
 					for (Video vd : vdList) {
 					%>
-					<a href="<%=ViewPath.getWatchLink(vd.getVideoId())%>"
+					<a href="<%=PathHelper.getWatchLink(vd.getVideoId())%>"
 						class="related-video-item">
 						<div class="thumbnail">
 							<img

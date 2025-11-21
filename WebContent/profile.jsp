@@ -21,9 +21,9 @@ request.getAttribute("success"); %>
         background: #f5f5f5;
       }
       .profile-container {
-        max-width: 600px;
-        margin: 50px auto;
-        padding: 40px;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
         background: white;
         border-radius: 16px;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -60,7 +60,7 @@ request.getAttribute("success"); %>
       }
 
       .form-group {
-        margin-bottom: 24px;
+        margin-bottom: 10px;
       }
 
       .form-group label {
@@ -88,9 +88,8 @@ request.getAttribute("success"); %>
       }
 
       .form-section {
-        margin-top: 40px;
         padding-top: 30px;
-        border-top: 2px solid #f0f0f0;
+        
       }
 
       .form-section h3 {
@@ -237,10 +236,7 @@ request.getAttribute("success"); %>
     <!-- MAIN CONTENT -->
     <main class="main-content" id="mainContent">
       <div class="profile-container">
-        <a href="${pageContext.request.contextPath}/home" class="back-link"
-          >← Quay lại trang chủ</a
-        >
-
+       
         <div class="profile-header">
           <div class="profile-avatar">
             <%= user.getName().substring(0, 1).toUpperCase() %>
