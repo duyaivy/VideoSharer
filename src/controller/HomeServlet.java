@@ -1,49 +1,61 @@
 package controller;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.ArrayList;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import model.BO.videoBO;
 import model.Bean.Video;
-import model.DAO.videoDAO;
+
 
 @WebServlet("/home")
 public class HomeServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
-    private videoDAO videoDao;
-    
-    @Override
-    public void init() {
-        videoDao = new videoDAO();
-    }
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        
-        
-        List<Video> videos = videoDao.getLatestVideos(20);
-        
-      
-        
-        if (videos != null && videos.size() > 0) {
-            for (Video v : videos) {
-                System.out.println("---");
-                System.out.println("ID: " + v.getVideoId());
-                System.out.println("Title: " + v.getTitle());
-                System.out.println("Img: " + v.getImg());
-                System.out.println("Img is null: " + (v.getImg() == null));
-                System.out.println("Img is empty: " + (v.getImg() != null && v.getImg().isEmpty()));
-            }
-        }
-        
-        System.out.println("========================================");
-        
-        request.setAttribute("videos", videos);
-        request.getRequestDispatcher("/home.jsp").forward(request, response);
+
+       
+		String pageS = request.getParameter("page");
+		String sizeS = request.getParameter("size");
+     
+		try {
+
+			int page = 1;
+			int size = 20;
+
+			if (pageS != null && !pageS.isEmpty()) {
+				try {
+					page = Integer.parseInt(pageS);
+				} catch (NumberFormatException ignore) {
+				}
+			}
+
+			if (sizeS != null && !sizeS.isEmpty()) {
+				try {
+					size = Integer.parseInt(sizeS);
+				} catch (NumberFormatException ignore) {
+				}
+			}
+
+			  
+	        ArrayList<Video> videos = videoBO.getInstance().getVideoLastest(page, size);
+	        request.setAttribute("videos", videos);
+ 
+	        
+	        request.setAttribute("isTrendingMode", false); 
+	        request.getRequestDispatcher("/home.jsp").forward(request, response);
+	    
+			
+
+		} catch (NumberFormatException e) {
+			request.setAttribute("message", "Lỗi trong quá trình tải trang");
+			request.getRequestDispatcher("/Error.jsp").forward(request, response);
+		}
     }
 }

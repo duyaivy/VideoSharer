@@ -163,7 +163,7 @@ public class videoDAO {
 		}
 	}
 
-	// Đếm tổng số video của 1 author (không tính video đã xoá)
+	
 	public int countByAuthor(int authorId) {
 		String sql = "SELECT COUNT(*) FROM video WHERE author_id = ? AND is_delete = 0";
 		try (Connection conn = ConnectDatabase.getMySQLConnection();
@@ -248,7 +248,7 @@ public class videoDAO {
 		return false;
 	}
 
-	// Trending (page, size) – chỉ lấy video chưa xoá, đã done
+	
 	public ArrayList<Video> getTrendingVideo(int page, int size) {
 		ArrayList<Video> ls = new ArrayList<>();
 
@@ -288,79 +288,32 @@ public class videoDAO {
 		return ls;
 	}
 
-	// Lấy video mới nhất
-	public List<Video> getLatestVideos(int limit) {
-		List<Video> videos = new ArrayList<>();
-		Connection conn = null;
-		PreparedStatement pstm = null;
-		ResultSet rs = null;
-
-		try {
-			conn = ConnectDatabase.getMySQLConnection();
-			String sql = "SELECT v.*, u.name as author_name " + "FROM video v " + "JOIN user u ON v.author_id = u.id "
-					+ "WHERE v.status IN ('ready','done','pending','processing') " + "AND v.is_delete = 0 "
-					+ "ORDER BY v.create_at DESC " + "LIMIT ?";
-
-			System.out.println("✅ videoDAO: Executing query...");
-			pstm = conn.prepareStatement(sql);
-			pstm.setInt(1, limit);
-			rs = pstm.executeQuery();
-
-			while (rs.next()) {
-				Video video = new Video();
-				video.setVideoId(rs.getInt("video_id"));
-				video.setAuthorId(rs.getInt("author_id"));
-				video.setTitle(rs.getString("title"));
-				video.setDescription(rs.getString("description"));
-				video.setImg(rs.getString("img"));
-				video.setCreateAt(rs.getTimestamp("create_at"));
-				video.setStatus(rs.getString("status"));
-				video.setPath(rs.getString("path"));
-				video.setView(rs.getLong("view"));
-				video.setAuthorName(rs.getString("author_name"));
-
-				videos.add(video);
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (rs != null)
-					rs.close();
-				if (pstm != null)
-					pstm.close();
-				if (conn != null)
-					conn.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-
-		return videos;
-	}
-
-	// Lấy video trending (top view)
-	public List<Video> getTrendingVideos(int limit) {
-	    List<Video> videos = new ArrayList<>();
+	public ArrayList<Video> getLastestVideo(int limit, int page) {
+	    ArrayList<Video> videos = new ArrayList<>();
 	    Connection conn = null;
 	    PreparedStatement pstm = null;
 	    ResultSet rs = null;
-	    
+
 	    try {
 	        conn = ConnectDatabase.getMySQLConnection();
-	        
-	        String sql = "SELECT v.*, u.name as author_name " +
-	                     "FROM video v " +
-	                     "JOIN user u ON v.author_id = u.id " +
-	                     "WHERE v.status IN ('ready', 'done', 'pending', 'processing') " +
-	                     "ORDER BY v.view DESC " +
-	                     "LIMIT ?";
-	        
+
+	        String sql = "SELECT v.*, u.name AS author_name "
+	                   + "FROM video v "
+	                   + "JOIN user u ON v.author_id = u.id "
+	                   + "WHERE v.status IN ('ready','done','pending','processing') "
+	                   + "AND v.is_delete = 0 "
+	                   + "ORDER BY v.create_at DESC "
+	                   + "LIMIT ?, ?";  
+
+	        int offset = (page - 1) * limit;
+	        if (offset < 0) offset = 0;
+
 	        pstm = conn.prepareStatement(sql);
+	        pstm.setInt(2, offset);
 	        pstm.setInt(1, limit);
+
 	        rs = pstm.executeQuery();
-	        
+
 	        while (rs.next()) {
 	            Video video = new Video();
 	            video.setVideoId(rs.getInt("video_id"));
@@ -373,12 +326,11 @@ public class videoDAO {
 	            video.setPath(rs.getString("path"));
 	            video.setView(rs.getLong("view"));
 	            video.setAuthorName(rs.getString("author_name"));
-	            
+
 	            videos.add(video);
 	        }
-	        
+
 	    } catch (Exception e) {
-	        System.err.println("❌ Error getting trending videos!");
 	        e.printStackTrace();
 	    } finally {
 	        try {
@@ -389,13 +341,9 @@ public class videoDAO {
 	            e.printStackTrace();
 	        }
 	    }
-	    
+
 	    return videos;
 	}
-
-	/**
-	 * Tìm kiếm video theo từ khóa
-	 */
 	public List<Video> searchVideos(String keyword) {
 	    List<Video> videos = new ArrayList<>();
 	    Connection conn = null;

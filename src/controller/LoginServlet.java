@@ -9,18 +9,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import helpers.PasswordHelper;
+import model.BO.userBO;
 import model.Bean.User;
-import model.DAO.userDAO;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
-    private userDAO userDao;
-    
-    @Override
-    public void init() {
-        userDao = new userDAO();
-    }
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
@@ -33,7 +27,7 @@ public class LoginServlet extends HttpServlet {
             return;
         }
         
-        // ⭐ LƯU REDIRECT URL VÀO SESSION (THÊM ĐOẠN NÀY)
+      
         String redirectUrl = request.getParameter("redirect");
         if (redirectUrl != null && !redirectUrl.isEmpty()) {
             HttpSession newSession = request.getSession();
@@ -41,7 +35,7 @@ public class LoginServlet extends HttpServlet {
             System.out.println("⭐ Saved redirect URL: " + redirectUrl);
         }
         
-        // Hiển thị trang login
+       
         request.getRequestDispatcher("/login.jsp").forward(request, response);
     }
     
@@ -68,7 +62,7 @@ public class LoginServlet extends HttpServlet {
             return;
         }
         
-        User user = userDao.getUserByEmail(email);
+        User user = userBO.getInstance().getUserByEmail(email);
         
         if (user == null) {
             request.setAttribute("error", "Email không tồn tại!");
@@ -88,20 +82,20 @@ public class LoginServlet extends HttpServlet {
         session.setAttribute("userName", user.getName());
         
         if ("on".equals(remember)) {
-            session.setMaxInactiveInterval(7 * 24 * 60 * 60); // 7 ngày
+            session.setMaxInactiveInterval(7 * 24 * 60 * 60); 
         } else {
-            session.setMaxInactiveInterval(30 * 60); // 30 phút
+            session.setMaxInactiveInterval(30 * 60); 
         }
         
         // ⭐ KIỂM TRA CÓ REDIRECT URL KHÔNG (THÊM ĐOẠN NÀY)
         String redirectUrl = (String) session.getAttribute("redirect_after_login");
         
         if (redirectUrl != null && !redirectUrl.isEmpty()) {
-            System.out.println("✅ Redirecting to: " + redirectUrl);
-            session.removeAttribute("redirect_after_login"); // Xóa sau khi dùng
+        
+            session.removeAttribute("redirect_after_login"); 
             response.sendRedirect(redirectUrl);
         } else {
-            System.out.println("✅ Redirecting to home");
+          
             response.sendRedirect(request.getContextPath() + "/home");
         }
     }

@@ -12,7 +12,6 @@ public class ConnectDatabase {
                      + "?useUnicode=true&characterEncoding=UTF-8";
         String username = "root";
         String password = "";
-        // String password = "KROmim21616";
 
         try {
             // Driver CŨ

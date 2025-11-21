@@ -39,9 +39,7 @@ public class EditVideoServlet extends HttpServlet {
 		}
 
 		int id = Integer.parseInt(idS);
-		videoBO bo = new videoBO();
-		Video v = bo.getVideoById(id);
-
+		Video v = videoBO.getInstance().getVideoById(id);
 		if (v == null || v.getAuthorId() != user.getId()) {
 			response.sendRedirect(request.getContextPath() + "/manage-video");
 			return;
@@ -66,15 +64,14 @@ public class EditVideoServlet extends HttpServlet {
 		String title = request.getParameter("title");
 		String des = request.getParameter("description");
 
-		videoBO bo = new videoBO();
-		Video v = bo.getVideoById(id);
+		Video v = videoBO.getInstance().getVideoById(id);
 
 		if (v == null || v.getAuthorId() != user.getId()) {
 			response.sendRedirect(request.getContextPath() + "/manage-video");
 			return;
 		}
 
-		bo.updateBasicInfo(id, title, des);
+		videoBO.getInstance().updateBasicInfo(id, title, des);
 		response.sendRedirect(request.getContextPath() + "/manage-video");
 	}
 }

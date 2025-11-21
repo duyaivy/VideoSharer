@@ -3,197 +3,302 @@
 	pageEncoding="UTF-8"%>
 <%@ page import="java.util.List"%>
 <%
-    // Lấy dữ liệu từ request attributes
-    List<Video> videos = (List<Video>) request.getAttribute("videos");
-    Integer totalVideos = (Integer) request.getAttribute("totalVideos");
-    Integer currentPage = (Integer) request.getAttribute("currentPage");
-    Integer totalPages = (Integer) request.getAttribute("totalPages");
-    
-    // Xử lý null
-    if (totalVideos == null) totalVideos = 0;
-    if (currentPage == null) currentPage = 1;
-    if (totalPages == null) totalPages = 1;
-    if (videos == null) videos = new java.util.ArrayList<>();
+// Lấy dữ liệu từ request attributes List<Video>
+List<Video> videos = (List<Video>) request.getAttribute("videos");
+Integer totalVideos = (Integer) request.getAttribute("totalVideos");
+Integer currentPage = (Integer) request.getAttribute("currentPage");
+Integer totalPages = (Integer) request.getAttribute("totalPages"); // Xử lý null if (totalVideos == null)
+totalVideos = 0;
+if (currentPage == null)
+	currentPage = 1;
+if (totalPages == null)
+	totalPages = 1;
+if (videos == null)
+	videos = new java.util.ArrayList<>();
 %>
-
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <title>Quản lý video - VideoSharer</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/index.css" />
 </head>
 <body>
-
-	<div class="container">
-		<div class="main-content">
-			<!-- HEADER -->
-			<div class="page-header">
-				<div>
-					<h1 class="page-title">🎛️ Quản lý video của bạn</h1>
-					<p class="page-subtitle">Theo dõi trạng thái xử lý, chỉnh sửa
-						và xoá video đã tải lên.</p>
-				</div>
-				<a href="<%= request.getContextPath() %>/upload-video"
-					class="primary-btn"> + Tải video mới </a>
-			</div>
-
-			<!-- STATS -->
-			<div class="stats-row">
-				<div class="stat-card">
-					<span class="stat-label">Tổng số video</span> <span
-						class="stat-value"><%= totalVideos %></span>
-				</div>
-			</div>
-
-			<!-- LIST / EMPTY STATE -->
-			<% if (videos.isEmpty()) { %>
-			<div class="empty-state">
-				<div class="empty-icon">📭</div>
-				<h2>Chưa có video nào</h2>
-				<p>Hãy tải lên video đầu tiên của bạn để bắt đầu chia sẻ với mọi
-					người.</p>
-				<a href="<%= request.getContextPath() %>/upload-video"
-					class="primary-btn"> Tải video ngay </a>
-			</div>
-			<% } else { %>
-			<div class="table-wrapper">
-				<table class="video-table">
-					<thead>
-						<tr>
-							<th class="col-id">ID</th>
-							<th class="col-thumb">Thumbnail</th>
-							<th class="col-title">Tiêu đề</th>
-							<th class="col-desc">Mô tả</th>
-							<th class="col-date">Ngày tạo</th>
-							<th class="col-status">Trạng thái</th>
-							<th class="col-actions">Hành động</th>
-						</tr>
-					</thead>
-					<tbody>
-						<% for (Video v : videos) { %>
-						<tr>
-							<td class="cell-id">#<%= v.getVideoId() %></td>
-
-							<td class="cell-thumb">
-								<% if (v.getImg() != null && !v.getImg().isEmpty()) { %> <img
-								src="<%= request.getContextPath() %>/<%= v.getImg() %>"
-								alt="thumbnail" class="thumb-img"> <% } %>
-							</td>
-
-							<td class="cell-title">
-								<div class="video-title-text"><%= v.getTitle() %></div>
-							</td>
-
-							<td class="cell-desc">
-								<div class="video-desc-text">
-									<%= v.getDescription() %>
-								</div>
-							</td>
-
-							<td class="cell-date"><%= v.getCreateAt() %></td>
-
-							<td class="cell-status"><span
-								id="status-<%= v.getVideoId() %>" class="status-badge"> <%= v.getStatus() %>
-							</span></td>
-
-							<td class="cell-actions"><a
-								href="<%= request.getContextPath() %>/watch?id=<%= v.getVideoId() %>"
-								class="action-link"> Xem </a> <span class="divider">•</span> <a
-								href="<%= request.getContextPath() %>/edit-video?id=<%= v.getVideoId() %>"
-								class="action-link"> Sửa </a> <span class="divider">•</span> <a
-								href="<%= request.getContextPath() %>/delete-video?id=<%= v.getVideoId() %>"
-								class="action-link action-link-danger"
-								onclick="return confirm('Xoá video này?')"> Xoá </a></td>
-						</tr>
-						<% } %>
-					</tbody>
-				</table>
-			</div>
-
-			<!-- PAGINATION -->
-			<div class="pagination">
-				<% if (totalPages > 1) { %>
-				<div class="pagination-inner">
-					<% if (currentPage > 1) { %>
-					<a
-						href="<%= request.getContextPath() %>/manage-video?page=<%= currentPage - 1 %>"
-						class="page-btn"> ‹ Trước </a>
-					<% } %>
-
-					<div class="page-numbers">
-						<% for (int i = 1; i <= totalPages; i++) { %>
-						<% if (i == currentPage) { %>
-						<span class="page-number active"><%= i %></span>
-						<% } else { %>
-						<a
-							href="<%= request.getContextPath() %>/manage-video?page=<%= i %>"
-							class="page-number"> <%= i %>
-						</a>
-						<% } %>
-						<% } %>
-					</div>
-
-					<% if (currentPage < totalPages) { %>
-					<a
-						href="<%= request.getContextPath() %>/manage-video?page=<%= currentPage + 1 %>"
-						class="page-btn"> Sau › </a>
-					<% } %>
-				</div>
-				<% } %>
-			</div>
-			<% } %>
+	<!-- HEADER -->
+	<header class="header">
+		<div class="header-left">
+			<button class="menu-btn" onclick="toggleSidebar()">☰</button>
+			<a href="${pageContext.request.contextPath}/home" class="logo">
+				🎬 <span>VideoSharer</span>
+			</a>
 		</div>
-	</div>
+
+		<div class="header-center">
+			<form action="${pageContext.request.contextPath}/search" method="GET"
+				class="search-form">
+				<input type="text" name="q" placeholder="Tìm kiếm video..."
+					class="search-input" />
+				<button type="submit" class="search-btn">🔍</button>
+			</form>
+		</div>
+
+		<div class="header-right">
+			<a href="${pageContext.request.contextPath}/upload-video"
+				class="upload-btn">📤 Đăng tải</a>
+			<div class="user-info">
+				<span class="user-name">👤 User</span> <a
+					href="${pageContext.request.contextPath}/profile"
+					style="color: white; text-decoration: none; margin-right: 15px">⚙️</a>
+				<a href="${pageContext.request.contextPath}/logout"
+					class="logout-btn">Đăng xuất</a>
+			</div>
+		</div>
+	</header>
+
+	<!-- SIDEBAR -->
+	<aside class="sidebar" id="sidebar">
+		<nav>
+			<a href="${pageContext.request.contextPath}/home" class="nav-item">
+				<span>🏠</span> <span>Trang chủ</span>
+			</a> <a href="${pageContext.request.contextPath}/trending"
+				class="nav-item"> <span>🔥</span> <span>Xu
+					hướng</span>
+			</a>
+			<hr />
+			<a href="${pageContext.request.contextPath}/manage-video"
+				class="nav-item active"> <span>📹</span> <span>Video
+					của tôi</span>
+			</a> <a href="${pageContext.request.contextPath}/liked" class="nav-item">
+				<span>👍</span> <span>Video đã thích</span>
+			</a>
+		</nav>
+	</aside>
+
+	<!-- MAIN CONTENT -->
+	<main class="main-content" id="mainContent">
+		<div class="container">
+			<div class="page-content">
+				<!-- HEADER -->
+				<div class="page-header">
+					<div>
+						<h1 class="page-title">🎛️ Quản lý video của bạn</h1>
+						<p class="page-subtitle">Theo dõi trạng thái xử lý, chỉnh sửa
+							và xoá video đã tải lên.</p>
+					</div>
+					<a href="<%=request.getContextPath()%>/upload-video"
+						class="primary-btn"> + Tải video mới </a>
+				</div>
+
+				<!-- STATS -->
+				<div class="stats-row">
+					<div class="stat-card">
+						<span class="stat-label">Tổng số video</span> <span
+							class="stat-value"><%=totalVideos%></span>
+					</div>
+				</div>
+
+				<!-- LIST / EMPTY STATE -->
+				<%
+				if (videos.isEmpty()) {
+				%>
+				<div class="empty-state">
+					<div class="empty-icon">📭</div>
+					<h2>Chưa có video nào</h2>
+					<p>Hãy tải lên video đầu tiên của bạn để bắt đầu chia sẻ với
+						mọi người.</p>
+					<a href="<%=request.getContextPath()%>/upload-video"
+						class="primary-btn"> Tải video ngay </a>
+				</div>
+				<%
+				} else {
+				%>
+				<div class="table-wrapper">
+					<table class="video-table">
+						<thead>
+							<tr>
+								<th class="col-id">ID</th>
+								<th class="col-thumb">Thumbnail</th>
+								<th class="col-title">Tiêu đề</th>
+								<th class="col-desc">Mô tả</th>
+								<th class="col-date">Ngày tạo</th>
+								<th class="col-status">Trạng thái</th>
+								<th class="col-actions">Hành động</th>
+							</tr>
+						</thead>
+						<tbody>
+							<%
+							for (Video v : videos) {
+							%>
+							<tr>
+								<td class="cell-id">#<%=v.getVideoId()%></td>
+
+								<td class="cell-thumb">
+									<%
+									if (v.getImg() != null && !v.getImg().isEmpty()) {
+									%> <img
+									src="<%=request.getContextPath()%>/<%=v.getImg()%>"
+									alt="thumbnail" class="thumb-img" />
+									<%
+									}
+									%>
+								</td>
+
+								<td class="cell-title">
+									<div class="video-title-text"><%=v.getTitle()%></div>
+								</td>
+
+								<td class="cell-desc">
+									<div class="video-desc-text">
+										<%=v.getDescription()%>
+									</div>
+								</td>
+
+								<td class="cell-date"><%=v.getCreateAt()%></td>
+
+								<td class="cell-status"><span
+									id="status-<%=v.getVideoId()%>" class="status-badge">
+										<%=v.getStatus()%>
+								</span></td>
+
+								<td class="cell-actions"><a
+									href="<%=request.getContextPath()%>/watch?id=<%=v.getVideoId()%>"
+									class="action-link"> Xem </a> <span
+									class="divider">•</span> <a
+									href="<%=request.getContextPath()%>/edit-video?id=<%=v.getVideoId()%>"
+									class="action-link"> Sửa </a> <span
+									class="divider">•</span> <a
+									href="<%=request.getContextPath()%>/delete-video?id=<%=v.getVideoId()%>"
+									class="action-link action-link-danger"
+									onclick="return confirm('Xoá video này?')">
+										Xoá </a></td>
+							</tr>
+							<%
+							}
+							%>
+						</tbody>
+					</table>
+				</div>
+
+				<!-- PAGINATION -->
+				<div class="pagination">
+					<%
+					if (totalPages > 1) {
+					%>
+					<div class="pagination-inner">
+						<%
+						if (currentPage > 1) {
+						%>
+						<a
+							href="<%=request.getContextPath()%>/manage-video?page=<%=currentPage - 1%>"
+							class="page-btn"> ‹ Trước </a>
+						<%
+						}
+						%>
+
+						<div class="page-numbers">
+							<%
+							for (int i = 1; i <= totalPages; i++) {
+							%>
+							<%
+							if (i == currentPage) {
+							%>
+							<span class="page-number active"><%=i%></span>
+							<%
+							} else {
+							%>
+							<a
+								href="<%=request.getContextPath()%>/manage-video?page=<%=i%>"
+								class="page-number"> <%=i%>
+							</a>
+							<%
+							}
+							%>
+							<%
+							}
+							%>
+						</div>
+
+						<%
+						if (currentPage < totalPages) {
+						%>
+						<a
+							href="<%=request.getContextPath()%>/manage-video?page=<%=currentPage + 1%>"
+							class="page-btn"> Sau › </a>
+						<%
+						}
+						%>
+					</div>
+					<%
+					}
+					%>
+				</div>
+				<%
+				}
+				%>
+				</div>
+			</div>
+		</div>
+	</main>
 
 	<script>
-    const ws = new WebSocket(
-        "ws://" + window.location.host + "<%= request.getContextPath() %>
-		/video-status");
+          function toggleSidebar() {
+            const sidebar = document.getElementById("sidebar");
+            const mainContent = document.getElementById("mainContent");
+            sidebar.classList.toggle("collapsed");
+            mainContent.classList.toggle("expanded");
+          }
+        </script>
 
-		function applyStatusStyle(el, status) {
-			el.classList.remove("status-processing", "status-done",
-					"status-failed", "status-other");
+	<script>
+            const ws = new WebSocket(
+                "ws://" + window.location.host + "<%=request.getContextPath()%>
+          /video-status");
 
-			if (status === "done") {
-				el.classList.add("status-done");
-			} else if (status === "failed") {
-				el.classList.add("status-failed");
-			} else {
-				// các trạng thái đang xử lý / hàng đợi...
-				el.classList.add("status-processing");
-			}
-		}
+          function applyStatusStyle(el, status) {
+          	el.classList.remove("status-processing", "status-done",
+          			"status-failed", "status-other");
 
-		ws.onmessage = function(event) {
-			const data = JSON.parse(event.data);
-			const el = document.getElementById("status-" + data.videoId);
+          	if (status === "done") {
+          		el.classList.add("status-done");
+          	} else if (status === "failed") {
+          		el.classList.add("status-failed");
+          	} else {
+          		// các trạng thái đang xử lý / hàng đợi...
+          		el.classList.add("status-processing");
+          	}
+          }
 
-			if (el) {
-				el.innerText = data.status;
-				applyStatusStyle(el, data.status);
-			}
-		};
+          ws.onmessage = function(event) {
+          	const data = JSON.parse(event.data);
+          	const el = document.getElementById("status-" + data.videoId);
 
-		ws.onclose = function() {
-			setTimeout(function() {
-				location.reload();
-			}, 2000);
-		};
+          	if (el) {
+          		el.innerText = data.status;
+          		applyStatusStyle(el, data.status);
+          	}
+          };
 
-		// Áp style ban đầu cho các status đã render từ server
-		window.addEventListener("DOMContentLoaded", function() {
-			const allStatus = document.querySelectorAll(".status-badge");
-			allStatus.forEach(function(el) {
-				applyStatusStyle(el, el.textContent.trim());
-			});
-		});
-	</script>
+          ws.onclose = function() {
+          	setTimeout(function() {
+          		location.reload();
+          	}, 2000);
+          };
+
+          // Áp style ban đầu cho các status đã render từ server
+          window.addEventListener("DOMContentLoaded", function() {
+          	const allStatus = document.querySelectorAll(".status-badge");
+          	allStatus.forEach(function(el) {
+          		applyStatusStyle(el, el.textContent.trim());
+          	});
+          });
+        </script>
 
 	<style>
 body {
 	margin: 0;
-	padding: 20px;
+	padding: 0;
 	font-family: Roboto, Arial, sans-serif;
 	color: #0f0f0f;
 	background: #f5f5f5;
@@ -204,7 +309,7 @@ body {
 	margin: 0 auto;
 }
 
-.main-content {
+.page-content {
 	background: #ffffff;
 	border-radius: 16px;
 	padding: 24px 24px 28px;
@@ -517,11 +622,12 @@ body {
 		width: 100%;
 		justify-content: center;
 	}
-	.main-content {
+	.page-content {
 		padding: 16px;
 	}
 }
 </style>
-
 </body>
 </html>
+</Video>
+</Video>

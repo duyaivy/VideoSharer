@@ -21,8 +21,13 @@ public class commentBO {
 		return bo;
 	}
 	
-	public boolean writeComment(int userID, int videoID, String message) {
-		return dao.writeComment(videoID, message, userID);
+	public Comment writeComment(int userID, int videoID, String message) {
+		int id = dao.writeComment(videoID, message, userID);
+		
+		if(id==-1) {
+			return null;
+		}
+		return dao.getCommentById(id);
 	}
 	public ArrayList<Comment> getCommentByVideoId(int vd_id, int page, int size) {
 		return dao.getCommentByVideoId(vd_id, page, size);

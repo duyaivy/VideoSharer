@@ -23,7 +23,6 @@ public class videoBO {
 		dao = new videoDAO();
 	}
 
-	// ================== UPLOAD VIDEO ==================
 	public boolean uploadVideo(int authorId, String title, String des, Part part) {
 
 		Video vd = dao.createVideo(authorId, title, des);
@@ -35,10 +34,9 @@ public class videoBO {
 		Path videoDir = ViewPath.getOriginalPath().resolve("video_" + videoId);
 
 		try {
-			// tạo thư mục lưu file
+
 			Files.createDirectories(videoDir);
 
-			// tên file upload
 			String submittedFileName = getSubmittedFileName(part);
 			if (submittedFileName == null || submittedFileName.isEmpty()) {
 				submittedFileName = "video_" + videoId + ".mp4";
@@ -47,16 +45,13 @@ public class videoBO {
 			String safeFileName = Paths.get(submittedFileName).getFileName().toString();
 			Path videoFile = videoDir.resolve(safeFileName);
 
-			// copy file lên server
 			try (InputStream in = part.getInputStream()) {
 				long bytes = Files.copy(in, videoFile);
 				System.out.println("Upload ok " + bytes + " bytes");
 			}
 
-			// set status đang xử lý
 			dao.updateVideoStatus(videoId, "processing");
 
-			// tạo thumbnail
 			String thumbFileName = "thumb.jpg";
 			Path thumbFile = videoDir.resolve(thumbFileName);
 
@@ -68,23 +63,20 @@ public class videoBO {
 				return false;
 			}
 
-			// lưu path tương đối vào DB
 			String relativeVideoPath = Paths.get("uploads/original/video_" + videoId, safeFileName).toString()
 					.replace("\\", "/");
 			String relativeImgPath = Paths.get("uploads/original/video_" + videoId, thumbFileName).toString()
 					.replace("\\", "/");
 
 			dao.updateVideoPath(videoId, relativeVideoPath, relativeImgPath);
-
-			// thêm vào queue để encode HLS
 			VideoQueueDAO queueDAO = new VideoQueueDAO();
 			boolean addedToQueue = queueDAO.addToQueue(videoId);
 
 			if (addedToQueue) {
-				System.out.println("✅ Video added to encoding queue: " + videoId);
+
 				dao.updateVideoStatus(videoId, "pending");
 			} else {
-				System.err.println("❌ Failed to add to queue");
+
 				dao.updateVideoStatus(videoId, "failed");
 				return false;
 			}
@@ -102,16 +94,22 @@ public class videoBO {
 		}
 	}
 
-	// singleton (nếu project có dùng)
 	public static videoBO getInstance() {
 		if (bo == null)
 			bo = new videoBO();
 		return bo;
 	}
 
-	// ================== TRENDING / XEM VIDEO ==================
 	public ArrayList<Video> getVideoTrending(int page, int size) {
 		return dao.getTrendingVideo(page, size);
+	}
+
+	public ArrayList<Video> getVideoLastest(int page, int size) {
+		return dao.getLastestVideo(page, size);
+	}
+
+	public List<Video> searchVideos(String keyword) {
+		return dao.searchVideos(keyword);
 	}
 
 	public Video getVideoById(int id) {
@@ -127,14 +125,10 @@ public class videoBO {
 		return vd;
 	}
 
-	// ================== MANAGE VIDEO (TASK 2) ==================
-
-	// đếm tổng số video của 1 author (chỉ lấy is_delete = 0 trong DAO)
 	public int countVideosByAuthor(int authorId) {
 		return dao.countByAuthor(authorId);
 	}
 
-	
 	public List<Video> getVideosByAuthorWithPaging(int authorId, int page, int pageSize) {
 		if (page < 1)
 			page = 1;
@@ -142,17 +136,14 @@ public class videoBO {
 		return dao.getVideosByAuthor(authorId, offset, pageSize);
 	}
 
-
 	public boolean updateBasicInfo(int videoId, String title, String description) {
 		return dao.updateVideoInfoBasic(videoId, title, description);
 	}
 
-	// delete mềm: đổi is_delete = 1
 	public boolean softDeleteVideo(int videoId, int authorId) {
 		return dao.softDelete(videoId, authorId);
 	}
 
-	// ================== HELPER ==================
 	private String getSubmittedFileName(Part part) {
 		if (part == null)
 			return null;

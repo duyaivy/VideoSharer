@@ -26,15 +26,7 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
-    <!-- =============================
-         KHÔNG KHAI BÁO SERVLET Ở ĐÂY
-         Vì bạn đang dùng @WebServlet trong code
-         (Tránh lỗi trùng mapping)
-    ============================== -->
-
-    <!-- =============================
-         Trang mặc định
-    ============================== -->
+   
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
