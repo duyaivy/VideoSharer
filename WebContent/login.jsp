@@ -14,14 +14,13 @@
             <h1>🎬 VideoSharer</h1>
             <h2>Đăng nhập</h2>
             
-            <%-- Hiển thị lỗi --%>
+            
             <% if (request.getAttribute("error") != null) { %>
                 <div class="alert alert-error">
                     <%= request.getAttribute("error") %>
                 </div>
             <% } %>
-            
-            <%-- Hiển thị thông báo thành công --%>
+          
             <% if (request.getAttribute("success") != null) { %>
                 <div class="alert alert-success">
                     <%= request.getAttribute("success") %>

@@ -15,13 +15,13 @@ public class ViewPath {
 	}
 
 	public static Path getOriginalPath() {
-		String projectPath = "F:\\\\App Downloads\\sts-4.27.0.RELEASE\\VideoSharer";
+		String projectPath = "D:/ECLIPSE2020/VideoSharer";
 		Path uploadBase = Paths.get(projectPath, "WebContent", "uploads", "original");
 		return uploadBase;
 	}
 
 	public static Path getHlsPath() {
-		String projectPath = "F:\\App Downloads\\sts-4.27.0.RELEASE\\VideoSharer";
+		String projectPath = "D:/ECLIPSE2020/VideoSharer";
 		Path uploadBase = Paths.get(projectPath, "WebContent", "uploads", "hls");
 		return uploadBase;
 	}

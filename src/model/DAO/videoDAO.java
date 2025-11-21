@@ -181,7 +181,7 @@ public class videoDAO {
 		return 0;
 	}
 
-	// Lấy list video theo author + phân trang (không tính video đã xoá)
+	
 	public List<Video> getVideosByAuthor(int authorId, int offset, int limit) {
 		List<Video> list = new ArrayList<>();
 		String sql = "SELECT * FROM video " + "WHERE author_id = ? AND is_delete = 0 " + "ORDER BY create_at DESC "
@@ -216,7 +216,6 @@ public class videoDAO {
 		return list;
 	}
 
-	// Chỉnh sửa title và description
 	public boolean updateVideoInfoBasic(int videoId, String title, String description) {
 		String sql = "UPDATE video SET title = ?, description = ? WHERE video_id = ?";
 
