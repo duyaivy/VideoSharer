@@ -248,52 +248,115 @@ public class videoDAO {
 	}
 
 	public List<Video> getTrendingVideos(int limit) {
-		List<Video> videos = new ArrayList<>();
-		try {
-			if (conn == null)
-				conn = ConnectDatabase.getMySQLConnection();
+	    List<Video> videos = new ArrayList<>();
+	    Connection conn = null;
+	    PreparedStatement pstm = null;
+	    ResultSet rs = null;
+	    
+	    try {
+	        conn = ConnectDatabase.getMySQLConnection();
+	        
+	        String sql = "SELECT v.*, u.name as author_name " +
+	                     "FROM video v " +
+	                     "JOIN user u ON v.author_id = u.id " +
+	                     "WHERE v.status IN ('ready', 'done', 'pending', 'processing') " +
+	                     "ORDER BY v.view DESC " +
+	                     "LIMIT ?";
+	        
+	        pstm = conn.prepareStatement(sql);
+	        pstm.setInt(1, limit);
+	        rs = pstm.executeQuery();
+	        
+	        while (rs.next()) {
+	            Video video = new Video();
+	            video.setVideoId(rs.getInt("video_id"));
+	            video.setAuthorId(rs.getInt("author_id"));
+	            video.setTitle(rs.getString("title"));
+	            video.setDescription(rs.getString("description"));
+	            video.setImg(rs.getString("img"));
+	            video.setCreateAt(rs.getTimestamp("create_at"));
+	            video.setStatus(rs.getString("status"));
+	            video.setPath(rs.getString("path"));
+	            video.setView(rs.getLong("view"));
+	            video.setAuthorName(rs.getString("author_name"));
+	            
+	            videos.add(video);
+	        }
+	        
+	    } catch (Exception e) {
+	        System.err.println("❌ Error getting trending videos!");
+	        e.printStackTrace();
+	    } finally {
+	        try {
+	            if (rs != null) rs.close();
+	            if (pstm != null) pstm.close();
+	            if (conn != null) conn.close();
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	    }
+	    
+	    return videos;
+	}
 
-			String sql = "SELECT v.*, u.name as author_name " +
-					"FROM video v " +
-					"JOIN user u ON v.author_id = u.id " +
-					"WHERE v.IN ('ready', 'done', 'pending', 'processing') " +
-					"ORDER BY v.view DESC " +
-					"LIMIT ?";
-
-			pstm = conn.prepareStatement(sql);
-			pstm.setInt(1, limit);
-			rs = pstm.executeQuery();
-
-			while (rs.next()) {
-				Video video = new Video();
-				video.setVideoId(rs.getInt("video_id"));
-				video.setAuthorId(rs.getInt("author_id"));
-				video.setTitle(rs.getString("title"));
-				video.setDescription(rs.getString("description"));
-				video.setImg(rs.getString("img"));
-				video.setCreateAt(rs.getTimestamp("create_at"));
-				video.setStatus(rs.getString("status"));
-				video.setPath(rs.getString("path"));
-				video.setView(rs.getLong("view"));
-				video.setAuthorName(rs.getString("author_name"));
-
-				videos.add(video);
-			}
-
-		} catch (Exception e) {
-			System.err.println("Lỗi khi lấy video trending!");
-			e.printStackTrace();
-		} finally {
-			try {
-				if (rs != null)
-					rs.close();
-				if (pstm != null)
-					pstm.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		return videos;
+	/**
+	 * Tìm kiếm video theo từ khóa
+	 */
+	public List<Video> searchVideos(String keyword) {
+	    List<Video> videos = new ArrayList<>();
+	    Connection conn = null;
+	    PreparedStatement pstm = null;
+	    ResultSet rs = null;
+	    
+	    try {
+	        conn = ConnectDatabase.getMySQLConnection();
+	        
+	        String sql = "SELECT v.*, u.name as author_name " +
+	                     "FROM video v " +
+	                     "JOIN user u ON v.author_id = u.id " +
+	                     "WHERE v.status = 'done' " +
+	                     "AND (v.title LIKE ? OR v.description LIKE ? OR u.name LIKE ?) " +
+	                     "ORDER BY v.create_at DESC " +
+	                     "LIMIT 50";
+	        
+	        pstm = conn.prepareStatement(sql);
+	        String searchPattern = "%" + keyword + "%";
+	        pstm.setString(1, searchPattern);
+	        pstm.setString(2, searchPattern);
+	        pstm.setString(3, searchPattern);
+	        
+	        rs = pstm.executeQuery();
+	        
+	        while (rs.next()) {
+	            Video video = new Video();
+	            video.setVideoId(rs.getInt("video_id"));
+	            video.setAuthorId(rs.getInt("author_id"));
+	            video.setTitle(rs.getString("title"));
+	            video.setDescription(rs.getString("description"));
+	            video.setImg(rs.getString("img"));
+	            video.setCreateAt(rs.getTimestamp("create_at"));
+	            video.setStatus(rs.getString("status"));
+	            video.setPath(rs.getString("path"));
+	            video.setView(rs.getLong("view"));
+	            video.setAuthorName(rs.getString("author_name"));
+	            
+	            videos.add(video);
+	        }
+	        
+	    } catch (Exception e) {
+	        System.err.println("❌ Error searching videos!");
+	        e.printStackTrace();
+	    } finally {
+	        try {
+	            if (rs != null) rs.close();
+	            if (pstm != null) pstm.close();
+	            if (conn != null) conn.close();
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	    }
+	    
+	    return videos;
 	}
 
 	

@@ -5,16 +5,36 @@
 <%
     User user = (User) session.getAttribute("user");
     List<Video> videos = (List<Video>) request.getAttribute("videos");
-    String keyword = (String) request.getAttribute("keyword");
-    Boolean isSearchMode = (Boolean) request.getAttribute("isSearchMode");
 %>
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VideoSharer - Chia sẻ video của bạn</title>
+    <title>Xu hướng - VideoSharer</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/home.css">
+    <style>
+        .trending-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        
+        .rank-number {
+            font-size: 16px;
+            font-weight: 900;
+        }
+    </style>
 </head>
 <body>
     <!-- HEADER -->
@@ -28,10 +48,7 @@
         
         <div class="header-center">
             <form action="${pageContext.request.contextPath}/search" method="GET" class="search-form">
-                <input type="text" name="q" 
-                       value="<%= keyword != null ? keyword : "" %>" 
-                       placeholder="Tìm kiếm video..." 
-                       class="search-input">
+                <input type="text" name="q" placeholder="Tìm kiếm video..." class="search-input">
                 <button type="submit" class="search-btn">🔍</button>
             </form>
         </div>
@@ -41,7 +58,6 @@
                 <a href="${pageContext.request.contextPath}/upload-video" class="upload-btn">📤 Đăng tải</a>
                 <div class="user-info">
                     <span class="user-name">👤 <%= user.getName() %></span>
-                    <a href="${pageContext.request.contextPath}/profile" style="color: white; text-decoration: none; margin-right: 15px;">⚙️</a>
                     <a href="${pageContext.request.contextPath}/logout" class="logout-btn">Đăng xuất</a>
                 </div>
             <% } else { %>
@@ -56,10 +72,10 @@
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
         <nav>
-            <a href="${pageContext.request.contextPath}/home" class="nav-item active">
+            <a href="${pageContext.request.contextPath}/home" class="nav-item">
                 <span>🏠</span> <span>Trang chủ</span>
             </a>
-            <a href="${pageContext.request.contextPath}/trending" class="nav-item">
+            <a href="${pageContext.request.contextPath}/trending" class="nav-item active">
                 <span>🔥</span> <span>Xu hướng</span>
             </a>
             <hr>
@@ -75,26 +91,12 @@
     <!-- MAIN CONTENT -->
     <main class="main-content" id="mainContent">
         <div class="container">
-            <!-- ⭐ TIÊU ĐỀ ĐỘNG -->
-            <h2 class="section-title">
-                <% if (isSearchMode != null && isSearchMode && keyword != null && !keyword.isEmpty()) { %>
-                    🔍 Kết quả tìm kiếm: "<%= keyword %>"
-                <% } else { %>
-                    📹 Video mới nhất
-                <% } %>
-            </h2>
+            <h2 class="section-title">🔥 Video xu hướng</h2>
             
-            <!-- ⭐ HIỂN THỊ SỐ LƯỢNG KẾT QUẢ NẾU LÀ SEARCH -->
-            <% if (isSearchMode != null && isSearchMode && keyword != null && !keyword.isEmpty()) { %>
-                <p style="color: #aaa; margin-bottom: 20px; font-size: 14px;">
-                    Tìm thấy <%= videos != null ? videos.size() : 0 %> video
-                </p>
-            <% } %>
-            
-            <!-- ⭐ DANH SÁCH VIDEO -->
-            <% if (videos != null && videos.size() > 0) { %>
-                <div class="video-grid">
-                    <% for (Video video : videos) { %>
+            <div class="video-grid">
+                <% if (videos != null && videos.size() > 0) { 
+                    int rank = 1;
+                    for (Video video : videos) { %>
                         <div class="video-card" onclick="window.location.href='${pageContext.request.contextPath}/watch?id=<%= video.getVideoId() %>'">
                             <div class="video-thumbnail">
                                 <% if (video.getImg() != null && !video.getImg().isEmpty()) { %>
@@ -105,7 +107,14 @@
                                     <img src="https://via.placeholder.com/320x180/667eea/ffffff?text=VideoSharer" 
                                          alt="No thumbnail">
                                 <% } %>
-                                <span class="video-duration"></span>
+                                
+                                <!-- RANKING BADGE -->
+                                <div class="trending-badge">
+                                    <span class="rank-number">#<%= rank %></span>
+                                    <span>🔥</span>
+                                </div>
+                                
+                                <span class="video-duration">10:25</span>
                             </div>
                             <div class="video-info">
                                 <h3 class="video-title"><%= video.getTitle() %></h3>
@@ -117,32 +126,22 @@
                                 </div>
                             </div>
                         </div>
-                    <% } %>
-                </div>
-            <% } else { %>
-                <!-- ⭐ KHÔNG CÓ VIDEO -->
-                <div class="no-videos">
-                    <% if (isSearchMode != null && isSearchMode && keyword != null && !keyword.isEmpty()) { %>
-                        <!-- Đang search nhưng không tìm thấy -->
-                        <div class="no-videos-icon">🔍</div>
-                        <h3>Không tìm thấy kết quả nào!</h3>
-                        <p>Không tìm thấy video nào với từ khóa "<%= keyword %>"</p>
-                        <a href="${pageContext.request.contextPath}/home" style="color: #667eea; text-decoration: none; margin-top: 15px; display: inline-block; font-size: 14px;">
-                            ← Quay lại trang chủ
-                        </a>
-                    <% } else { %>
-                        <!-- Không có video nào trong hệ thống -->
-                        <div class="no-videos-icon">📹</div>
-                        <h3>Chưa có video nào!</h3>
+                <% 
+                        rank++;
+                    } 
+                } else { %>
+                    <div class="no-videos">
+                        <div class="no-videos-icon">🔥</div>
+                        <h3>Chưa có video xu hướng!</h3>
                         <p>Hãy là người đầu tiên đăng tải video</p>
                         <% if (user != null) { %>
                             <a href="${pageContext.request.contextPath}/upload-video" class="btn-upload-now">
                                 📤 Đăng tải ngay
                             </a>
                         <% } %>
-                    <% } %>
-                </div>
-            <% } %>
+                    </div>
+                <% } %>
+            </div>
         </div>
     </main>
     

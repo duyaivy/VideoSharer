@@ -45,6 +45,8 @@ public class LikeServlet extends HttpServlet {
 	    response.setContentType("application/json; charset=UTF-8");
 	    response.setCharacterEncoding("UTF-8");
 	    
+	    
+	    
 	    String user_id = request.getParameter("user_id");
 	    String video_id = request.getParameter("video_id");
 	    String type = request.getParameter("type");

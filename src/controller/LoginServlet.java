@@ -1,4 +1,3 @@
-// src/controller/LoginServlet.java
 package controller;
 
 import java.io.IOException;
@@ -34,6 +33,14 @@ public class LoginServlet extends HttpServlet {
             return;
         }
         
+        // ⭐ LƯU REDIRECT URL VÀO SESSION (THÊM ĐOẠN NÀY)
+        String redirectUrl = request.getParameter("redirect");
+        if (redirectUrl != null && !redirectUrl.isEmpty()) {
+            HttpSession newSession = request.getSession();
+            newSession.setAttribute("redirect_after_login", redirectUrl);
+            System.out.println("⭐ Saved redirect URL: " + redirectUrl);
+        }
+        
         // Hiển thị trang login
         request.getRequestDispatcher("/login.jsp").forward(request, response);
     }
@@ -45,12 +52,10 @@ public class LoginServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
         
-
         String email = request.getParameter("email");
         String password = request.getParameter("password");
         String remember = request.getParameter("remember");
         
-      
         if (email == null || email.trim().isEmpty()) {
             request.setAttribute("error", "Vui lòng nhập email!");
             request.getRequestDispatcher("/login.jsp").forward(request, response);
@@ -63,7 +68,6 @@ public class LoginServlet extends HttpServlet {
             return;
         }
         
-    
         User user = userDao.getUserByEmail(email);
         
         if (user == null) {
@@ -72,19 +76,16 @@ public class LoginServlet extends HttpServlet {
             return;
         }
         
-        
         if (!PasswordHelper.checkPassword(password, user.getPasswordHash())) {
             request.setAttribute("error", "Mật khẩu không đúng!");
             request.getRequestDispatcher("/login.jsp").forward(request, response);
             return;
         }
         
-        
         HttpSession session = request.getSession();
         session.setAttribute("user", user);
         session.setAttribute("userId", user.getId());
         session.setAttribute("userName", user.getName());
-        
         
         if ("on".equals(remember)) {
             session.setMaxInactiveInterval(7 * 24 * 60 * 60); // 7 ngày
@@ -92,6 +93,16 @@ public class LoginServlet extends HttpServlet {
             session.setMaxInactiveInterval(30 * 60); // 30 phút
         }
         
-        response.sendRedirect(request.getContextPath() + "/home");
+        // ⭐ KIỂM TRA CÓ REDIRECT URL KHÔNG (THÊM ĐOẠN NÀY)
+        String redirectUrl = (String) session.getAttribute("redirect_after_login");
+        
+        if (redirectUrl != null && !redirectUrl.isEmpty()) {
+            System.out.println("✅ Redirecting to: " + redirectUrl);
+            session.removeAttribute("redirect_after_login"); // Xóa sau khi dùng
+            response.sendRedirect(redirectUrl);
+        } else {
+            System.out.println("✅ Redirecting to home");
+            response.sendRedirect(request.getContextPath() + "/home");
+        }
     }
 }
