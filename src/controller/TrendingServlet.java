@@ -25,25 +25,14 @@ public class TrendingServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
-        System.out.println("========================================");
-        System.out.println("⭐ TrendingServlet: Loading trending videos...");
-        
+      
         // Lấy top 20 video có view cao nhất
         List<Video> videos = videoDao.getTrendingVideos(20);
         
-        System.out.println("✅ Found " + (videos != null ? videos.size() : 0) + " trending videos");
-        
-        if (videos != null && videos.size() > 0) {
-            for (Video v : videos) {
-                System.out.println("ID: " + v.getVideoId() + 
-                                 " | Title: " + v.getTitle() + 
-                                 " | Views: " + v.getView());
-            }
-        }
-        
-        System.out.println("========================================");
-        
+    
         request.setAttribute("videos", videos);
-        request.getRequestDispatcher("/trending.jsp").forward(request, response);
+        request.setAttribute("isTrendingMode", true); // Đánh dấu đang ở chế độ trending
+        
+        request.getRequestDispatcher("/home.jsp").forward(request, response);
     }
 }
