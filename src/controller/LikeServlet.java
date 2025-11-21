@@ -50,6 +50,7 @@ public class LikeServlet extends HttpServlet {
 	    String user_id = request.getParameter("user_id");
 	    String video_id = request.getParameter("video_id");
 	    String type = request.getParameter("type");
+	    
 	    int likeCount = 0;
 	    int disLikeCount = 0;
 	    boolean status = false;
@@ -62,10 +63,12 @@ public class LikeServlet extends HttpServlet {
 	        if ("like".equals(type)) {
 	            status = likeBO.getInstance().likeVideo(v_id, u_id);
 	            likeCount = likeBO.getInstance().getLikeCountByVideoId(v_id);
-	            disLikeCount = likeBO.getInstance().getLikeCountByVideoId(v_id);
+	            disLikeCount = likeBO.getInstance().getDisLikeCountByVideoId(v_id);
 	            
 	        } else if ("dislike".equals(type)) {
 	            status = likeBO.getInstance().disLikeVideo(v_id, u_id);
+	            likeCount = likeBO.getInstance().getLikeCountByVideoId(v_id);
+	            disLikeCount = likeBO.getInstance().getDisLikeCountByVideoId(v_id);
 	        }
 	        
 	        message = status ? "Thành công! " : "Thất bại! Bạn đã thực hiện hành động này rồi";

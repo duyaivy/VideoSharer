@@ -1,3 +1,4 @@
+<%@page import="model.Bean.User"%>
 <%@page import="model.Bean.Comment"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="helpers.ViewPath"%>
@@ -32,6 +33,9 @@ if (likeCount == null)
 	likeCount = 0;
 if (dislikeCount == null)
 	dislikeCount = 0;
+
+
+
 %>
 <!DOCTYPE html>
 <html lang="vi">
@@ -825,9 +829,9 @@ function handleClickDislike(e) {
     .then(response => response.json())
     .then(data => {
         if (data.status) {
-            document.getElementById('likeCount').textContent = data.likeCount;
-            document.getElementById('dislikeCount').textContent = data.dislikeCount;
             
+            document.getElementById('likeCount').textContent = data.likeCount;
+            document.getElementById('dislikeCount').textContent = data.disLikeCount;
             if (data.userStatus === 'like') {
                 likeCheckbox.checked = true;
                 dislikeCheckbox.checked = false;
@@ -877,6 +881,8 @@ player.ready(function() {
         displayCurrentQuality: true
     });
 });
+
+
 </script>
 </body>
 </html>
