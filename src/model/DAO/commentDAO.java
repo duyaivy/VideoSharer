@@ -63,7 +63,7 @@ public class commentDAO {
 
 	public boolean writeComment(int video_id, String message, int user_id) {
 		Connection conn = null;
-		String sql = "insert into `comment`  (`video_id`, `user_id`, `message`) VALUES (?,?,?)";
+		String sql = "INSERT INTO `comment` (`video_id`, `user_id`, `message`) VALUES (?,?,?)";
 
 		try {
 			conn = ConnectDatabase.getMySQLConnection();

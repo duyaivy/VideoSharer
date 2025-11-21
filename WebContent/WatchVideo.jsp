@@ -3,6 +3,7 @@
 <%@page import="java.util.ArrayList"%>
 <%@page import="helpers.ViewPath"%>
 <%@page import="model.Bean.Video"%>
+<%@page import="model.Bean.User"%>
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 
 <%
@@ -12,19 +13,20 @@ if (video == null) {
 	return;
 }
 if (!video.getStatus().equals("done")) {
-	request.setAttribute("err", "Video bạn truy cập đang trong quá trình xử lý hoạc bị lỗi!");
+	request.setAttribute("err", "Video bạn truy cập đang trong quá trình xử lý hoặc bị lỗi!");
 	request.getRequestDispatcher(ViewPath.resolve("Error")).forward(request, response);
 	return;
 }
-String videoUrl = request.getContextPath() + "/" + video.getPath();
-User u =(User) request.getSession().getAttribute("user");
 
+// ⭐ LẤY USER TỪ SESSION
+User user = (User) session.getAttribute("user");
+
+String videoUrl = request.getContextPath() + "/" + video.getPath();
 Integer likeCount = (Integer) request.getAttribute("like_count");
 Integer dislikeCount = (Integer) request.getAttribute("dislike_count");
 String userLikeStatus = (String) request.getAttribute("user_like_status");
 
 ArrayList<Video> vdList = (ArrayList<Video>) request.getAttribute("video_list");
-
 ArrayList<Comment> cmtList = (ArrayList<Comment>) request.getAttribute("comment_list");
 
 if (likeCount == null)
@@ -40,7 +42,7 @@ if (dislikeCount == null)
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title><%=video.getTitle()%>| Watch video</title>
+<title><%=video.getTitle()%> | Watch video</title>
 
 <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
 
@@ -343,10 +345,12 @@ body {
 	transition: transform 0.3s ease;
 	padding: 5px;
 }
+
 .related-video-item:hover {
 	transform: translateY(-5px);
-	background-color: rgba(0,0,0,0.2)
+	background-color: rgba(0,0,0,0.2);
 }
+
 .thumbnail {
 	width: 168px;
 	height: 94px;
@@ -430,11 +434,124 @@ body {
 	color: #2196F3;
 	margin-right: 5px;
 }
+
+/* ⭐ CSS CHO LOGIN MODAL */
+.login-modal {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.7);
+	z-index: 10000;
+	justify-content: center;
+	align-items: center;
+}
+
+.login-modal.active {
+	display: flex;
+}
+
+.login-modal-content {
+	background: white;
+	padding: 40px;
+	border-radius: 16px;
+	text-align: center;
+	max-width: 400px;
+	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+	animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(-20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.login-modal-icon {
+	font-size: 64px;
+	margin-bottom: 20px;
+}
+
+.login-modal-content h3 {
+	font-size: 24px;
+	margin-bottom: 12px;
+	color: #333;
+}
+
+.login-modal-content p {
+	font-size: 16px;
+	color: #666;
+	margin-bottom: 24px;
+	line-height: 1.6;
+}
+
+.login-modal-buttons {
+	display: flex;
+	gap: 12px;
+	justify-content: center;
+}
+
+.btn-modal {
+	padding: 12px 30px;
+	border-radius: 25px;
+	font-weight: 600;
+	font-size: 14px;
+	cursor: pointer;
+	transition: all 0.3s;
+	border: none;
+	text-decoration: none;
+	display: inline-block;
+}
+
+.btn-modal-login {
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	color: white;
+	box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.btn-modal-login:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+.btn-modal-cancel {
+	background: #f0f0f0;
+	color: #333;
+}
+
+.btn-modal-cancel:hover {
+	background: #e0e0e0;
+}
 </style>
 </head>
 <body>
-	<div class="container">
+	<!-- ⭐ LOGIN MODAL -->
+	<div class="login-modal" id="loginModal">
+    <div class="login-modal-content">
+        <div class="login-modal-icon">🔒</div>
+        <h3>Bạn cần đăng nhập!</h3>
+        <p>Vui lòng đăng nhập để bình luận và tương tác với video</p>
+        <div class="login-modal-buttons">
+            <!-- ⭐ THÊM REDIRECT_URL -->
+            <a href="${pageContext.request.contextPath}/login?redirect=${pageContext.request.contextPath}/watch?id=<%= video.getVideoId() %>" 
+               class="btn-modal btn-modal-login">
+                Đăng nhập ngay
+            </a>
+            <button class="btn-modal btn-modal-cancel" onclick="closeLoginModal()">
+                Hủy
+            </button>
+        </div>
+    </div>
+</div>
 
+	<div class="container">
 		<div class="main-content">
 			<div class="video-wrapper">
 				<video id="videoPlayer"
@@ -450,28 +567,35 @@ body {
 
 				<div class="stats-and-actions">
 					<div class="video-stats">
-						<span style="margin-right: 20px;"><%=video.getView()%> lượt
-							xem</span> <span>Đăng ngày: 19/11/2025</span>
+						<span style="margin-right: 20px;"><%=video.getView()%> lượt xem</span>
+						<span>Đăng ngày: 19/11/2025</span>
 					</div>
 
 					<div class="video-actions">
 						<input type="checkbox" id="likeCheckbox"
 							<%="like".equals(userLikeStatus) ? "checked" : ""%>
-							style="display: none;"> <label for="likeCheckbox"
+							style="display: none;">
+						<label for="likeCheckbox"
 							class="action-button like-btn" onclick="handleClickLike(event)">
-							<span class="icon">👍</span> <span id="likeCount"><%=likeCount%></span>
+							<span class="icon">👍</span>
+							<span id="likeCount"><%=likeCount%></span>
 							<span>Thích</span>
-						</label> <input type="checkbox" id="dislikeCheckbox"
+						</label>
+						
+						<input type="checkbox" id="dislikeCheckbox"
 							<%="dislike".equals(userLikeStatus) ? "checked" : ""%>
-							style="display: none;"> <label for="dislikeCheckbox"
+							style="display: none;">
+						<label for="dislikeCheckbox"
 							class="action-button dislike-btn"
-							onclick="handleClickDislike(event)"> <span class="icon">👎</span>
-							<span id="dislikeCount"><%=dislikeCount%></span> <span>Không
-								thích</span>
+							onclick="handleClickDislike(event)">
+							<span class="icon">👎</span>
+							<span id="dislikeCount"><%=dislikeCount%></span>
+							<span>Không thích</span>
 						</label>
 
 						<div class="action-button share-btn">
-							<span class="icon">🔗</span> <span>Chia sẻ</span>
+							<span class="icon">🔗</span>
+							<span>Chia sẻ</span>
 						</div>
 					</div>
 				</div>
@@ -486,25 +610,31 @@ body {
 				}
 				%>
 			</div>
+			
+			<!-- COMMENT SECTION -->
 			<div class="comment-list">
 				<h2>💬 Bình Luận (<%=cmtList.size()%>)</h2>
 				
-				<form action="comment" method="post" class="comment-form">
-					<div class="comment-avatar">U</div>
+				<!-- ⭐ LUÔN HIỂN THỊ FORM - KIỂM TRA KHI SUBMIT -->
+				<form id="commentForm" action="comment" method="post" onsubmit="return handleCommentSubmit(event)" class="comment-form">
+					<div class="comment-avatar">
+						<%= user != null ? user.getName().substring(0, 1).toUpperCase() : "?" %>
+					</div>
 					<div class="comment-input-wrapper">
-						<input name="user_id" type="hidden" value="<%= u.getId() %>">
+						<% if (user != null) { %>
+							<input name="user_id" type="hidden" value="<%= user.getId() %>">
+						<% } %>
 						<input name="video_id" type="hidden" value="<%= video.getVideoId() %>">
-						<input name="message" type="text" class="comment-input" 
+						<input name="message" type="text" class="comment-input" id="commentInput"
 							placeholder="Viết bình luận công khai..." required>
 						<button type="submit" class="comment-submit-btn">Bình luận</button>
 					</div>
 				</form>
 				
+				<!-- DANH SÁCH COMMENT -->
 				<div class="comments-container">
 				<%
 				for (Comment c : cmtList) {
-
-					// Tính thời gian "x giờ trước / x phút trước"
 					long currentMillis = System.currentTimeMillis();
 					long commentMillis = c.getCreateAt().getTime();
 					long diff = currentMillis - commentMillis;
@@ -524,7 +654,6 @@ body {
 						timeAgo = diffDays + " ngày trước";
 					}
 					
-					// Lấy chữ cái đầu tiên của tên người dùng
 					String firstLetter = c.getUserName() != null && !c.getUserName().isEmpty() 
 						? c.getUserName().substring(0, 1).toUpperCase() 
 						: "?";
@@ -564,16 +693,12 @@ body {
 					<div class="video-details">
 						<div class="related-title"><%=vd.getTitle()%></div>
 						<div class="related-channel"><%=vd.getStatus().toUpperCase()%></div>
-						<div class="related-stats"><%=vd.getView()%>
-							lượt xem •
-							<%=vd.getCreateAt()%></div>
+						<div class="related-stats"><%=vd.getView()%> lượt xem • <%=vd.getCreateAt()%></div>
 					</div>
 				</a>
 				<%
 				}
 				%>
-
-
 			</div>
 		</div>
 	</div>
@@ -585,10 +710,42 @@ body {
 		src="https://cdn.jsdelivr.net/npm/videojs-hls-quality-selector@1.1.4/dist/videojs-hls-quality-selector.min.js"></script>
 	<script>
 var videoId = <%=video.getVideoId()%>;
-var userId = <%=u.getId()%>;
+var userId = <%= user != null ? user.getId() : 0 %>;
+var isLoggedIn = <%= user != null ? "true" : "false" %>;
+
+
+function handleCommentSubmit(event) {
+	if (!isLoggedIn) {
+		event.preventDefault();
+		showLoginModal();
+		return false;
+	}
+	
+	return true;
+}
+
+function showLoginModal() {
+	document.getElementById('loginModal').classList.add('active');
+}
+
+function closeLoginModal() {
+	document.getElementById('loginModal').classList.remove('active');
+}
+
+
+document.getElementById('loginModal').addEventListener('click', function(e) {
+	if (e.target === this) {
+		closeLoginModal();
+	}
+});
+
 function handleClickLike(e) {
-    
-   
+	
+   e.preventDefault();
+    if (!isLoggedIn) {
+        showLoginModal();
+        return false;
+    }
     const likeCheckbox = document.getElementById('likeCheckbox');
     const dislikeCheckbox = document.getElementById('dislikeCheckbox');
     const likeBtn = document.querySelector('.like-btn');
@@ -644,6 +801,9 @@ function handleClickLike(e) {
 
 function handleClickDislike(e) {
     e.preventDefault();
+    if (!isLoggedIn) {
+        showLoginModal();
+        return false;
     
     const likeCheckbox = document.getElementById('likeCheckbox');
     const dislikeCheckbox = document.getElementById('dislikeCheckbox');
@@ -684,18 +844,17 @@ function handleClickDislike(e) {
             }
         } else {
             alert(data.message);
-            likeCheckbox.checked = isCurrentlyLiked;
+            dislikeCheckbox.checked = isCurrentlyDisliked;
         }
     })
     .catch(error => {
         console.error('Error:', error);
         alert('Có lỗi xảy ra!');
-        likeCheckbox.checked = isCurrentlyLiked;
+        dislikeCheckbox.checked = isCurrentlyDisliked;
     })
     .finally(() => {
-        likeBtn.classList.remove('processing');
+        dislikeBtn.classList.remove('processing');
     });
-    
     
     return false;
 }

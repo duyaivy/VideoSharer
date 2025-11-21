@@ -173,30 +173,43 @@ public class userDAO {
 
    
     public boolean updateUser(User user) {
+        Connection conn = null;
+        PreparedStatement pstm = null;
+        
+        String sql = "UPDATE `user` SET `name` = ?, `email` = ?, `password_hash` = ? WHERE `id` = ?";
+        
+        System.out.println("⭐ userDAO.updateUser()");
+        System.out.println("User ID: " + user.getId());
+        System.out.println("Name: " + user.getName());
+        System.out.println("Email: " + user.getEmail());
+        
         try {
-            if (conn == null)
-                conn = ConnectDatabase.getMySQLConnection();
-
-            String sql = "UPDATE user SET name = ?, email = ?, update_at = NOW() WHERE id = ?";
-            
+            conn = ConnectDatabase.getMySQLConnection();
             pstm = conn.prepareStatement(sql);
+            
             pstm.setString(1, user.getName());
             pstm.setString(2, user.getEmail());
-            pstm.setInt(3, user.getId());
-
+            pstm.setString(3, user.getPasswordHash());
+            pstm.setInt(4, user.getId());
+            
             int rows = pstm.executeUpdate();
-            return rows > 0;
-
+            
+            if (rows > 0) {
+                System.out.println("✅ User updated successfully!");
+                return true;
+            } else {
+                System.out.println("❌ No rows affected!");
+                return false;
+            }
+            
         } catch (Exception e) {
-            System.err.println("Lỗi khi cập nhật user!");
+            System.err.println("❌ Error updating user!");
             e.printStackTrace();
             return false;
         } finally {
             try {
-                if (pstm != null) {
-                    pstm.close();
-                    pstm = null;
-                }
+                if (pstm != null) pstm.close();
+                if (conn != null) conn.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }
