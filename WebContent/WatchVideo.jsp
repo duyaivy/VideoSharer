@@ -1,3 +1,4 @@
+<%@page import="model.Bean.User"%>
 <%@page import="model.Bean.Comment"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="helpers.ViewPath"%>
@@ -10,13 +11,14 @@ if (video == null) {
 	response.sendRedirect(request.getContextPath() + ViewPath.resolve("Login"));
 	return;
 }
-//if (!video.getStatus().equals("done")) {
-//	request.setAttribute("err", "Video bạn truy cập đang trong quá trình xử lý hoạc bị lỗi!");
-//	request.getRequestDispatcher(ViewPath.resolve("Error")).forward(request, response);
-//	return;
-//}
+if (!video.getStatus().equals("done")) {
+	request.setAttribute("err", "Video bạn truy cập đang trong quá trình xử lý hoạc bị lỗi!");
+	request.getRequestDispatcher(ViewPath.resolve("Error")).forward(request, response);
+	return;
+}
 String videoUrl = request.getContextPath() + "/" + video.getPath();
-int user_id = 1;
+User u =(User) request.getSession().getAttribute("user");
+
 Integer likeCount = (Integer) request.getAttribute("like_count");
 Integer dislikeCount = (Integer) request.getAttribute("dislike_count");
 String userLikeStatus = (String) request.getAttribute("user_like_status");
@@ -29,6 +31,9 @@ if (likeCount == null)
 	likeCount = 0;
 if (dislikeCount == null)
 	dislikeCount = 0;
+
+
+
 %>
 <!DOCTYPE html>
 <html lang="vi">
@@ -432,25 +437,13 @@ body {
 
 		<div class="main-content">
 			<div class="video-wrapper">
-			    <% if (!video.getStatus().equals("done")) { %>
-			        <div id="processing-msg" class="video-processing-msg">
- 			           Video đang được xử lý, vui lòng đợi...
-    			    </div>
-   				     <video id="videoPlayer"
-  		             class="video-js vjs-big-play-centered video-player"
-  		             controls preload="auto"
- 		              style="display:none;">
- 			       </video>
-			    <% } else { %>    
- 			       <video id="videoPlayer"
- 			           class="video-js vjs-big-play-centered video-player" controls
-       				     preload="auto"
-       				     poster="<%=video.getImg() != null ? request.getContextPath() + "/" + video.getImg() : ""%>">
-      			      	<source src="<%=videoUrl%>" type="application/x-mpegURL">
-        			</video>
-    			<% } %>
+				<video id="videoPlayer"
+					class="video-js vjs-big-play-centered video-player" controls
+					preload="auto"
+					poster="<%=video.getImg() != null ? request.getContextPath() + "/" + video.getImg() : ""%>">
+					<source src="<%=videoUrl%>" type="application/x-mpegURL">
+				</video>
 			</div>
-
 
 			<div class="video-info">
 				<h1 class="video-title"><%=video.getTitle()%></h1>
@@ -499,7 +492,7 @@ body {
 				<form action="comment" method="post" class="comment-form">
 					<div class="comment-avatar">U</div>
 					<div class="comment-input-wrapper">
-						<input name="user_id" type="hidden" value="<%= user_id %>">
+						<input name="user_id" type="hidden" value="<%= u.getId() %>">
 						<input name="video_id" type="hidden" value="<%= video.getVideoId() %>">
 						<input name="message" type="text" class="comment-input" 
 							placeholder="Viết bình luận công khai..." required>
@@ -592,7 +585,7 @@ body {
 		src="https://cdn.jsdelivr.net/npm/videojs-hls-quality-selector@1.1.4/dist/videojs-hls-quality-selector.min.js"></script>
 	<script>
 var videoId = <%=video.getVideoId()%>;
-var userId = 1;
+var userId = <%=u.getId()%>;
 function handleClickLike(e) {
     
    
@@ -676,9 +669,9 @@ function handleClickDislike(e) {
     .then(response => response.json())
     .then(data => {
         if (data.status) {
-            document.getElementById('likeCount').textContent = data.likeCount;
-            document.getElementById('dislikeCount').textContent = data.dislikeCount;
             
+            document.getElementById('likeCount').textContent = data.likeCount;
+            document.getElementById('dislikeCount').textContent = data.disLikeCount;
             if (data.userStatus === 'like') {
                 likeCheckbox.checked = true;
                 dislikeCheckbox.checked = false;
@@ -706,8 +699,6 @@ function handleClickDislike(e) {
     
     return false;
 }
-const videoId = <%=video.getVideoId()%>;
-const ctx = "<%=request.getContextPath()%>";
 
 var player = videojs('videoPlayer', {
     controls: true,
@@ -730,47 +721,9 @@ player.ready(function() {
     player.hlsQualitySelector({
         displayCurrentQuality: true
     });
- // Chỉ bật realtime nếu video chưa done
-    <% if (!video.getStatus().equals("done")) { %>
-
-    const ws = new WebSocket("ws://localhost:8080/VideoSharer/video-status");
-
-    ws.onmessage = function(e){
-        const data = JSON.parse(e.data);
-
-        if (data.videoId !== videoId) return;
-
-        if (data.status === "done") {
-
-            const msg = document.getElementById("processing-msg");
-            if (msg) msg.style.display = "none";
-
-            const vp = document.getElementById("videoPlayer");
-            vp.style.display = "block";
-
-            player.src({
-                src: ctx + "/<%=video.getPath()%>",
-                type: "application/x-mpegURL"
-            });
-
-            player.play();
-        }
-    };
-
-    <% } %>
-
 });
-</script>
-<div id="toast" class="toast"></div>
 
-<script>
-function showToast(msg){
-    const t = document.getElementById("toast");
-    t.innerText = msg;
-    t.classList.add("show");
-    setTimeout(()=>t.classList.remove("show"), 3000);
-}
-</script>
 
+</script>
 </body>
 </html>

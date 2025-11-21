@@ -53,7 +53,7 @@ public class WatchVideoServlet extends HttpServlet {
 			return;
 		}
 
-		int userId = user.getId();
+		
 
 		try {
 			int videoId = Integer.parseInt(params);
@@ -85,7 +85,8 @@ public class WatchVideoServlet extends HttpServlet {
 			ArrayList<Video> vdList = videoBO.getInstance().getVideoTrending(page, size);
 
 			ArrayList<Comment> commentList = commentBO.getInstance().getCommentByVideoId(vd.getVideoId(), page, size);
-
+			
+			
 			int likeCount = likeBO.getInstance().getLikeCountByVideoId(vd.getVideoId());
 			request.setAttribute("like_count", likeCount);
 			int disLikeCount = likeBO.getInstance().getDisLikeCountByVideoId(vd.getVideoId());

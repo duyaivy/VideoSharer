@@ -18,23 +18,23 @@ import model.Bean.Video;
 @WebServlet("/manage-video")
 public class ManageVideoServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static final int PAGE_SIZE = 5; // số video mỗi trang
+	private static final int PAGE_SIZE = 5; 
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		// 1. Lấy user từ session (giả sử bạn lưu là "user")
+		
 		HttpSession session = request.getSession(false);
 		User user = (session != null) ? (User) session.getAttribute("user") : null;
 		if (user == null) {
 			response.sendRedirect(request.getContextPath() + "/login");
 			return;
 		}
-
+	
 		int authorId = user.getId();
 
-		// 2. Lấy param page
+		
 		int page = 1;
 		String pageParam = request.getParameter("page");
 		if (pageParam != null) {
@@ -45,9 +45,8 @@ public class ManageVideoServlet extends HttpServlet {
 			}
 		}
 
-		// 3. Gọi BO lấy dữ liệu
-		videoBO bo = new videoBO();
-		int totalVideos = bo.countVideosByAuthor(authorId);
+		
+		int totalVideos = videoBO.getInstance().countVideosByAuthor(authorId);
 
 		int totalPages = (int) Math.ceil(totalVideos * 1.0 / PAGE_SIZE);
 		if (totalPages == 0)
@@ -55,9 +54,9 @@ public class ManageVideoServlet extends HttpServlet {
 		if (page > totalPages)
 			page = totalPages;
 
-		List<Video> videos = bo.getVideosByAuthorWithPaging(authorId, page, PAGE_SIZE);
+		List<Video> videos = videoBO.getInstance().getVideosByAuthorWithPaging(authorId, page, PAGE_SIZE);
 
-		// 4. Gửi sang JSP
+		
 		request.setAttribute("videos", videos);
 		request.setAttribute("currentPage", page);
 		request.setAttribute("totalPages", totalPages);
@@ -66,4 +65,9 @@ public class ManageVideoServlet extends HttpServlet {
 		RequestDispatcher rd = request.getRequestDispatcher("/ManageVideo.jsp");
 		rd.forward(request, response);
 	}
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		doGet(request, response);
+	}
+
 }

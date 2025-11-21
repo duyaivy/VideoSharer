@@ -134,7 +134,7 @@ public class videoBO {
 		return dao.countByAuthor(authorId);
 	}
 
-	// lấy danh sách video theo author + phân trang
+	
 	public List<Video> getVideosByAuthorWithPaging(int authorId, int page, int pageSize) {
 		if (page < 1)
 			page = 1;
@@ -142,7 +142,7 @@ public class videoBO {
 		return dao.getVideosByAuthor(authorId, offset, pageSize);
 	}
 
-	// chỉ update title + description (theo yêu cầu)
+
 	public boolean updateBasicInfo(int videoId, String title, String description) {
 		return dao.updateVideoInfoBasic(videoId, title, description);
 	}

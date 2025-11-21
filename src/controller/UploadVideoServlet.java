@@ -32,7 +32,7 @@ public class UploadVideoServlet extends HttpServlet {
 
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
-            // Chưa login → Redirect về trang login
+          
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
@@ -80,8 +80,8 @@ public class UploadVideoServlet extends HttpServlet {
             boolean isDone = videoBO.getInstance().uploadVideo(authorId, title, description, filePart);
 
             if (isDone) {
-                request.setAttribute("author_id", authorId);
-                request.getRequestDispatcher(ViewPath.resolve("ManageVideo")).forward(request, response);
+            	
+                request.getRequestDispatcher("/manage-video").forward(request, response);
                 return;
             }
 
