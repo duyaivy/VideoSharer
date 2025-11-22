@@ -1,10 +1,11 @@
+<%@page import="java.util.ArrayList"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="model.Bean.User" %>
 <%@ page import="model.Bean.Video" %>
 <%@ page import="java.util.List" %>
 <%
     User user = (User) session.getAttribute("user");
-    List<Video> videos = (List<Video>) request.getAttribute("videos");
+    ArrayList<Video> videos = (ArrayList<Video>) request.getAttribute("videos");
     String keyword = (String) request.getAttribute("keyword");
     Boolean isSearchMode = (Boolean) request.getAttribute("isSearchMode");
     Boolean isTrendingMode = (Boolean) request.getAttribute("isTrendingMode");
@@ -16,34 +17,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VideoSharer - Chia sẻ video của bạn</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/home.css">
-    <style>
-        /* ⭐ CSS CHO TRENDING BADGE */
-        .trending-badge {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
-            color: white;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-            z-index: 10;
-        }
-        
-        .rank-number {
-            font-size: 16px;
-            font-weight: 900;
-        }
-        
-        .video-thumbnail {
-            position: relative;
-        }
-    </style>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/index.css">
+    
 </head>
 <body>
     <!-- HEADER -->
@@ -69,8 +44,8 @@
             <% if (user != null) { %>
                 <a href="${pageContext.request.contextPath}/upload-video" class="upload-btn">📤 Đăng tải</a>
                 <div class="user-info">
-                    <span class="user-name">👤 <%= user.getName() %></span>
-                    <a href="${pageContext.request.contextPath}/profile" style="color: white; text-decoration: none; margin-right: 15px;">⚙️</a>
+                    
+                    <a href="${pageContext.request.contextPath}/profile" style="color: white; text-decoration: none; margin-right: 15px;"><span class="user-name">🙍‍♂️ <%= user.getName() %></span></a>
                     <a href="${pageContext.request.contextPath}/logout" class="logout-btn">Đăng xuất</a>
                 </div>
             <% } else { %>
@@ -94,11 +69,11 @@
                 <span>🔥</span> <span>Xu hướng</span>
             </a>
             <hr>
-            <a href="${pageContext.request.contextPath}/my-videos" class="nav-item">
+            <a href="${pageContext.request.contextPath}/manage-video" class="nav-item">
                 <span>📹</span> <span>Video của tôi</span>
             </a>
-            <a href="${pageContext.request.contextPath}/liked" class="nav-item">
-                <span>👍</span> <span>Video đã thích</span>
+            <a href="${pageContext.request.contextPath}/profile" class="nav-item">
+                <span>🙍‍♂️ </span> <span>Thông tin cá nhân</span>
             </a>
         </nav>
     </aside>
@@ -168,7 +143,6 @@
                                     </div>
                                 <% } %>
                                 
-                                <span class="video-duration">10:25</span>
                             </div>
                             <div class="video-info">
                                 <h3 class="video-title"><%= video.getTitle() %></h3>
@@ -196,7 +170,7 @@
                         <h3>Không tìm thấy kết quả nào!</h3>
                         <p>Không tìm thấy video nào với từ khóa "<%= keyword %>"</p>
                         <a href="${pageContext.request.contextPath}/home" style="color: #667eea; text-decoration: none; margin-top: 15px; display: inline-block; font-size: 14px;">
-                            ← Quay lại trang chủ
+                            Quay lại trang chủ
                         </a>
                     <% 
                     } else if (isTrendingMode != null && isTrendingMode) { 

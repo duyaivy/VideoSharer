@@ -18,7 +18,6 @@ if (!video.getStatus().equals("done")) {
 	return;
 }
 
-// ⭐ LẤY USER TỪ SESSION
 User user = (User) session.getAttribute("user");
 
 String videoUrl = request.getContextPath() + "/" + video.getPath();
@@ -33,9 +32,6 @@ if (likeCount == null)
 	likeCount = 0;
 if (dislikeCount == null)
 	dislikeCount = 0;
-
-
-
 %>
 <!DOCTYPE html>
 <html lang="vi">
@@ -45,11 +41,13 @@ if (dislikeCount == null)
 <title><%=video.getTitle()%> | Watch video</title>
 
 <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/assets/css/index.css">
 
 <style>
 body {
 	margin: 0;
-	padding: 20px;
+	padding: 0;
 	font-family: Roboto, Arial, sans-serif;
 	color: #000;
 }
@@ -75,11 +73,12 @@ body {
 }
 
 .comment-list {
-	margin: 20px auto;
+	width: 100%; margin : 20px auto;
 	padding: 24px;
 	background-color: #fff;
 	border-radius: 12px;
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+	margin: 20px auto;
 }
 
 .comment-list h2 {
@@ -129,6 +128,15 @@ body {
 	transition: all 0.3s ease;
 	outline: none;
 	box-sizing: border-box;
+}
+
+.action-button.active {
+	background-color: #6874c3;
+	color: white;
+}
+
+.action-button.active:hover {
+	background-color: #6c75b2;
 }
 
 .comment-input:focus {
@@ -275,14 +283,16 @@ body {
 	pointer-events: none;
 }
 
-.container {
+.watch-container {
 	max-width: 1700px;
 	margin: 0 auto;
+	padding: 20px;
 	display: flex;
+	flex-direction: row;
 	gap: 24px;
 }
 
-.main-content {
+.watch-container>div:first-child {
 	flex-grow: 1;
 	min-width: 0;
 }
@@ -348,7 +358,7 @@ body {
 
 .related-video-item:hover {
 	transform: translateY(-5px);
-	background-color: rgba(0,0,0,0.2);
+	background-color: rgba(0, 0, 0, 0.2);
 }
 
 .thumbnail {
@@ -463,17 +473,17 @@ body {
 	animation: modalFadeIn 0.3s ease;
 }
 
-@keyframes modalFadeIn {
-	from {
-		opacity: 0;
-		transform: translateY(-20px);
-	}
-	to {
-		opacity: 1;
-		transform: translateY(0);
-	}
+@
+keyframes modalFadeIn {from { opacity:0;
+	transform: translateY(-20px);
 }
 
+to {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+}
 .login-modal-icon {
 	font-size: 64px;
 	margin-bottom: 20px;
@@ -532,176 +542,253 @@ body {
 </style>
 </head>
 <body>
-	<!-- ⭐ LOGIN MODAL -->
-	<div class="login-modal" id="loginModal">
-    <div class="login-modal-content">
-        <div class="login-modal-icon">🔒</div>
-        <h3>Bạn cần đăng nhập!</h3>
-        <p>Vui lòng đăng nhập để bình luận và tương tác với video</p>
-        <div class="login-modal-buttons">
-            <!-- ⭐ THÊM REDIRECT_URL -->
-            <a href="${pageContext.request.contextPath}/login?redirect=${pageContext.request.contextPath}/watch?id=<%= video.getVideoId() %>" 
-               class="btn-modal btn-modal-login">
-                Đăng nhập ngay
+	<!-- HEADER -->
+	<header class="header">
+		<div class="header-left">
+			<button class="menu-btn" onclick="toggleSidebar()">☰</button>
+			<a href="${pageContext.request.contextPath}/home" class="logo">
+				🎬 <span>VideoSharer</span>
+			</a>
+		</div>
+
+		<div class="header-center">
+			<form action="${pageContext.request.contextPath}/search" method="GET"
+				class="search-form">
+				<input type="text" name="q" placeholder="Tìm kiếm video..."
+					class="search-input">
+				<button type="submit" class="search-btn">🔍</button>
+			</form>
+		</div>
+
+		<div class="header-right">
+			<%
+			if (user != null) {
+			%>
+			<a href="${pageContext.request.contextPath}/upload-video"
+				class="upload-btn">📤 Đăng tải</a>
+			<div class="user-info">
+				<span class="user-name">👤 <%=user.getName()%></span> <a
+					href="${pageContext.request.contextPath}/profile"
+					style="color: white; text-decoration: none; margin-right: 15px;">⚙️</a>
+				<a href="${pageContext.request.contextPath}/logout"
+					class="logout-btn">Đăng xuất</a>
+			</div>
+			<%
+			} else {
+			%>
+			<div class="auth-links">
+				<a href="${pageContext.request.contextPath}/login">Đăng nhập</a> <a
+					href="${pageContext.request.contextPath}/signup">Đăng ký</a>
+			</div>
+			<%
+			}
+			%>
+		</div>
+	</header>
+
+	<!-- SIDEBAR -->
+	<aside class="sidebar" id="sidebar">
+		<nav>
+			<a href="${pageContext.request.contextPath}/home" class="nav-item">
+				<span>🏠</span> <span>Trang chủ</span>
+			</a> <a href="${pageContext.request.contextPath}/trending"
+				class="nav-item"> <span>🔥</span> <span>Xu hướng</span>
+			</a>
+			<hr>
+			<a href="${pageContext.request.contextPath}/manage-video" class="nav-item">
+                <span>📹</span> <span>Video của tôi</span>
             </a>
-            <button class="btn-modal btn-modal-cancel" onclick="closeLoginModal()">
-                Hủy
-            </button>
-        </div>
-    </div>
-</div>
+            <a href="${pageContext.request.contextPath}/profile" class="nav-item">
+                <span>🙍‍♂️ </span> <span>Thông tin cá nhân</span>
+            </a>
+		</nav>
+	</aside>
 
-	<div class="container">
-		<div class="main-content">
-			<div class="video-wrapper">
-				<video id="videoPlayer"
-					class="video-js vjs-big-play-centered video-player" controls
-					preload="auto"
-					poster="<%=video.getImg() != null ? request.getContextPath() + "/" + video.getImg() : ""%>">
-					<source src="<%=videoUrl%>" type="application/x-mpegURL">
-				</video>
+	<!-- MAIN CONTENT -->
+	<main class="main-content" id="mainContent">
+		<!-- ⭐ LOGIN MODAL -->
+		<div class="login-modal" id="loginModal">
+			<div class="login-modal-content">
+				<div class="login-modal-icon">🔒</div>
+				<h3>Bạn cần đăng nhập!</h3>
+				<p>Vui lòng đăng nhập để bình luận và tương tác với video</p>
+				<div class="login-modal-buttons">
+					<!-- ⭐ THÊM REDIRECT_URL -->
+					<a
+						href="${pageContext.request.contextPath}/login?redirect=${pageContext.request.contextPath}/watch?id=<%= video.getVideoId() %>"
+						class="btn-modal btn-modal-login"> Đăng nhập ngay </a>
+					<button class="btn-modal btn-modal-cancel"
+						onclick="closeLoginModal()">Hủy</button>
+				</div>
 			</div>
+		</div>
 
-			<div class="video-info">
-				<h1 class="video-title"><%=video.getTitle()%></h1>
+		<div class="watch-container">
+			<div style="">
 
-				<div class="stats-and-actions">
-					<div class="video-stats">
-						<span style="margin-right: 20px;"><%=video.getView()%> lượt xem</span>
-						<span>Đăng ngày: 19/11/2025</span>
-					</div>
+				<div class="video-wrapper">
+					<video id="videoPlayer"
+						class="video-js vjs-big-play-centered video-player" controls
+						preload="auto"
+						poster="<%=video.getImg() != null ? request.getContextPath() + "/" + video.getImg() : ""%>">
+						<source src="<%=videoUrl%>" type="application/x-mpegURL">
+					</video>
+				</div>
 
-					<div class="video-actions">
-						<input type="checkbox" id="likeCheckbox"
-							<%="like".equals(userLikeStatus) ? "checked" : ""%>
-							style="display: none;">
-						<label for="likeCheckbox"
-							class="action-button like-btn" onclick="handleClickLike(event)">
-							<span class="icon">👍</span>
-							<span id="likeCount"><%=likeCount%></span>
-							<span>Thích</span>
-						</label>
-						
-						<input type="checkbox" id="dislikeCheckbox"
-							<%="dislike".equals(userLikeStatus) ? "checked" : ""%>
-							style="display: none;">
-						<label for="dislikeCheckbox"
-							class="action-button dislike-btn"
-							onclick="handleClickDislike(event)">
-							<span class="icon">👎</span>
-							<span id="dislikeCount"><%=dislikeCount%></span>
-							<span>Không thích</span>
-						</label>
+				<div class="video-info">
+					<h1 class="video-title"><%=video.getTitle()%></h1>
 
-						<div class="action-button share-btn">
-							<span class="icon">🔗</span>
-							<span>Chia sẻ</span>
+					<div class="stats-and-actions">
+						<div class="video-stats">
+							<span style="margin-right: 20px;"><%=video.getView()%>
+								lượt xem</span> <span>Đăng ngày: 19/11/2025</span>
+						</div>
+
+						<div class="video-actions">
+							<input type="checkbox" id="likeCheckbox"
+								<%="like".equals(userLikeStatus) ? "checked" : ""%>
+								style="display: none;"> <label for="likeCheckbox"
+								class="action-button like-btn" onclick="handleClickLike(event)">
+								<span class="icon">👍</span> <span id="likeCount"><%=likeCount%></span>
+								<span>Thích</span>
+							</label> <input type="checkbox" id="dislikeCheckbox"
+								<%="dislike".equals(userLikeStatus) ? "checked" : ""%>
+								style="display: none;"> <label for="dislikeCheckbox"
+								class="action-button dislike-btn"
+								onclick="handleClickDislike(event)"> <span class="icon">👎</span>
+								<span id="dislikeCount"><%=dislikeCount%></span> <span>Không
+									thích</span>
+							</label>
+
+							<div class="action-button share-btn">
+								<span class="icon">🔗</span> <span>Chia sẻ</span>
+							</div>
 						</div>
 					</div>
-				</div>
 
-				<%
-				if (video.getDescription() != null && !video.getDescription().trim().isEmpty()) {
-				%>
-				<div class="video-description">
-					<%=video.getDescription()%>
-				</div>
-				<%
-				}
-				%>
-			</div>
-			
-			<!-- COMMENT SECTION -->
-			<div class="comment-list">
-				<h2>💬 Bình Luận (<%=cmtList.size()%>)</h2>
-				
-				<!-- ⭐ LUÔN HIỂN THỊ FORM - KIỂM TRA KHI SUBMIT -->
-				<form id="commentForm" action="comment" method="post" onsubmit="return handleCommentSubmit(event)" class="comment-form">
-					<div class="comment-avatar">
-						<%= user != null ? user.getName().substring(0, 1).toUpperCase() : "?" %>
+					<%
+					if (video.getDescription() != null && !video.getDescription().trim().isEmpty()) {
+					%>
+					<div class="video-description">
+						<%=video.getDescription()%>
 					</div>
-					<div class="comment-input-wrapper">
-						<% if (user != null) { %>
-							<input name="user_id" type="hidden" value="<%= user.getId() %>">
-						<% } %>
-						<input name="video_id" type="hidden" value="<%= video.getVideoId() %>">
-						<input name="message" type="text" class="comment-input" id="commentInput"
-							placeholder="Viết bình luận công khai..." required>
-						<button type="submit" class="comment-submit-btn">Bình luận</button>
-					</div>
-				</form>
-				
-				<!-- DANH SÁCH COMMENT -->
-				<div class="comments-container">
-				<%
-				for (Comment c : cmtList) {
-					long currentMillis = System.currentTimeMillis();
-					long commentMillis = c.getCreateAt().getTime();
-					long diff = currentMillis - commentMillis;
-
-					long diffMinutes = diff / (60 * 1000);
-					long diffHours = diff / (60 * 60 * 1000);
-					long diffDays = diff / (24 * 60 * 60 * 1000);
-
-					String timeAgo;
-					if (diffMinutes < 1) {
-						timeAgo = "Vừa xong";
-					} else if (diffMinutes < 60) {
-						timeAgo = diffMinutes + " phút trước";
-					} else if (diffHours < 24) {
-						timeAgo = diffHours + " giờ trước";
-					} else {
-						timeAgo = diffDays + " ngày trước";
+					<%
 					}
-					
-					String firstLetter = c.getUserName() != null && !c.getUserName().isEmpty() 
-						? c.getUserName().substring(0, 1).toUpperCase() 
-						: "?";
-				%>
-				<div class="comment-item">
-					<div class="comment-avatar-small"><%=firstLetter%></div>
-					<div class="comment-content">
-						<div class="comment-header">
-							<p class="comment-user"><%=c.getUserName()%></p>
-							<p class="comment-email"><%=c.getUserEmail()%></p>
-							<p class="comment-time">• <%=timeAgo%></p>
+					%>
+				</div>
+
+				<!-- COMMENT SECTION -->
+				<div class="comment-list">
+					<h2>
+						💬 Bình Luận (<%=cmtList.size()%>)
+					</h2>
+
+					<!-- ⭐ LUÔN HIỂN THỊ FORM - KIỂM TRA KHI SUBMIT -->
+					<form id="commentForm" action="comment" method="post"
+						onsubmit="return handleCommentSubmit(event)" class="comment-form">
+						<div class="comment-avatar">
+							<%=user != null ? user.getName().substring(0, 1).toUpperCase() : "?"%>
 						</div>
-						<p class="comment-message"><%=c.getMessage()%></p>
+						<div class="comment-input-wrapper">
+							<%
+							if (user != null) {
+							%>
+							<input name="user_id" type="hidden" value="<%=user.getId()%>">
+							<%
+							}
+							%>
+							<input name="video_id" type="hidden"
+								value="<%=video.getVideoId()%>"> <input name="message"
+								type="text" class="comment-input" id="commentInput"
+								placeholder="Viết bình luận công khai..." required>
+							<button type="submit" class="comment-submit-btn">Bình
+								luận</button>
+						</div>
+					</form>
+
+					<!-- DANH SÁCH COMMENT -->
+					<div class="comments-container">
+						<%
+						for (Comment c : cmtList) {
+							long currentMillis = System.currentTimeMillis();
+							long commentMillis = c.getCreateAt().getTime();
+							long diff = currentMillis - commentMillis;
+
+							long diffMinutes = diff / (60 * 1000);
+							long diffHours = diff / (60 * 60 * 1000);
+							long diffDays = diff / (24 * 60 * 60 * 1000);
+
+							String timeAgo;
+							if (diffMinutes < 1) {
+								timeAgo = "Vừa xong";
+							} else if (diffMinutes < 60) {
+								timeAgo = diffMinutes + " phút trước";
+							} else if (diffHours < 24) {
+								timeAgo = diffHours + " giờ trước";
+							} else {
+								timeAgo = diffDays + " ngày trước";
+							}
+
+							String firstLetter = c.getUserName() != null && !c.getUserName().isEmpty()
+							? c.getUserName().substring(0, 1).toUpperCase()
+							: "?";
+						%>
+						<div class="comment-item">
+							<div class="comment-avatar-small"><%=firstLetter%></div>
+							<div class="comment-content">
+								<div class="comment-header">
+									<p class="comment-user"><%=c.getUserName()%></p>
+									<p class="comment-email"><%=c.getUserEmail()%></p>
+									<p class="comment-time">
+										•
+										<%=timeAgo%></p>
+								</div>
+								<p class="comment-message"><%=c.getMessage()%></p>
+							</div>
+						</div>
+						<%
+						}
+						%>
 					</div>
 				</div>
-				<%
-				}
-				%>
+			</div>
+			<div class="related-sidebar">
+				<h3>Video đề xuất</h3>
+				<div class="related-video-list">
+					<%
+					for (Video vd : vdList) {
+					%>
+					<a href="<%=ViewPath.getWatchLink(vd.getVideoId())%>"
+						class="related-video-item">
+						<div class="thumbnail">
+							<img
+								src="<%=vd.getImg() != null ? request.getContextPath() + "/" + vd.getImg() : ""%>"
+								alt="Thumbnail">
+						</div>
+						<div class="video-details">
+							<div class="related-title"><%=vd.getTitle()%></div>
+							<div class="related-channel"><%=vd.getStatus().toUpperCase()%></div>
+							<div class="related-stats"><%=vd.getView()%>
+								lượt xem •
+								<%=vd.getCreateAt()%></div>
+						</div>
+					</a>
+					<%
+					}
+					%>
 				</div>
 			</div>
-
 		</div>
+	</main>
 
-		<div class="related-sidebar">
-			<h3>Video đề xuất</h3>
-			<div class="related-video-list">
-				<%
-				for (Video vd : vdList) {
-				%>
-				<a href="<%=ViewPath.getWatchLink(vd.getVideoId())%>"
-					class="related-video-item">
-					<div class="thumbnail">
-						<img
-							src="<%=vd.getImg() != null ? request.getContextPath() + "/" + vd.getImg() : ""%>"
-							alt="Thumbnail">
-					</div>
-					<div class="video-details">
-						<div class="related-title"><%=vd.getTitle()%></div>
-						<div class="related-channel"><%=vd.getStatus().toUpperCase()%></div>
-						<div class="related-stats"><%=vd.getView()%> lượt xem • <%=vd.getCreateAt()%></div>
-					</div>
-				</a>
-				<%
-				}
-				%>
-			</div>
-		</div>
-	</div>
+	<script>
+	function toggleSidebar() {
+		const sidebar = document.getElementById('sidebar');
+		const mainContent = document.getElementById('mainContent');
+		sidebar.classList.toggle('collapsed');
+		mainContent.classList.toggle('expanded');
+	}
+	</script>
 
 	<script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
 	<script
@@ -710,8 +797,11 @@ body {
 		src="https://cdn.jsdelivr.net/npm/videojs-hls-quality-selector@1.1.4/dist/videojs-hls-quality-selector.min.js"></script>
 	<script>
 var videoId = <%=video.getVideoId()%>;
-var userId = <%= user != null ? user.getId() : 0 %>;
-var isLoggedIn = <%= user != null ? "true" : "false" %>;
+var userId = <%=user != null ? user.getId() : 0%>;
+var isLoggedIn = <%=user != null ? true : false%>;
+
+    const likeBtn = document.querySelector('.like-btn');
+    const dislikeBtn = document.querySelector('.dislike-btn');
 
 
 function handleCommentSubmit(event) {
@@ -748,9 +838,8 @@ function handleClickLike(e) {
     }
     const likeCheckbox = document.getElementById('likeCheckbox');
     const dislikeCheckbox = document.getElementById('dislikeCheckbox');
-    const likeBtn = document.querySelector('.like-btn');
     
-    likeBtn.classList.add('processing');
+  
     
     const isCurrentlyLiked = likeCheckbox.checked;
     var type = 'like';
@@ -782,6 +871,8 @@ function handleClickLike(e) {
                 likeCheckbox.checked = false;
                 dislikeCheckbox.checked = false;
             }
+            likeBtn.classList.add('active');
+            dislikeBtn.classList.remove('active');
         } else {
             alert(data.message);
             likeCheckbox.checked = isCurrentlyLiked;
@@ -792,9 +883,7 @@ function handleClickLike(e) {
         alert('Có lỗi xảy ra!');
         likeCheckbox.checked = isCurrentlyLiked;
     })
-    .finally(() => {
-        likeBtn.classList.remove('processing');
-    });
+   
     
     return false;
 }
@@ -804,12 +893,11 @@ function handleClickDislike(e) {
     if (!isLoggedIn) {
         showLoginModal();
         return false;
-    
+    }
     const likeCheckbox = document.getElementById('likeCheckbox');
     const dislikeCheckbox = document.getElementById('dislikeCheckbox');
     const dislikeBtn = document.querySelector('.dislike-btn');
-    
-    dislikeBtn.classList.add('processing');
+   
     
     const isCurrentlyDisliked = dislikeCheckbox.checked;
     const type = 'dislike';
@@ -842,6 +930,8 @@ function handleClickDislike(e) {
                 likeCheckbox.checked = false;
                 dislikeCheckbox.checked = false;
             }
+            dislikeBtn.classList.add('active');
+            likeBtn.classList.remove('active');
         } else {
             alert(data.message);
             dislikeCheckbox.checked = isCurrentlyDisliked;
@@ -852,9 +942,7 @@ function handleClickDislike(e) {
         alert('Có lỗi xảy ra!');
         dislikeCheckbox.checked = isCurrentlyDisliked;
     })
-    .finally(() => {
-        dislikeBtn.classList.remove('processing');
-    });
+    
     
     return false;
 }
@@ -882,7 +970,36 @@ player.ready(function() {
     });
 });
 
+const ws = new WebSocket("ws://<%=request.getServerName()%>:<%=request.getServerPort()%><%=request.getContextPath()%>/videos/<%=video.getVideoId()%>");
 
+ws.onmessage = function(event) {
+    const data = JSON.parse(event.data);
+    if(data.type =="comment"){
+    const commentsContainer = document.querySelector('.comments-container');
+    
+    
+   
+   
+    const html = `
+    <div class="comment-item">
+        <div class="comment-avatar-small">\${data.name.charAt(0).toUpperCase()}</div>
+        <div class="comment-content">
+            <div class="comment-header">
+                <p class="comment-user">\${data.name}</p>
+                <p class="comment-email">\${data.email}</p>
+                <p class="comment-time">• Vừa xong</p>
+            </div>
+            <p class="comment-message">\${data.message}</p>
+        </div>
+    </div>
+    `;
+    
+    commentsContainer.insertAdjacentHTML('afterbegin', html);
+    }else{
+        document.getElementById('likeCount').textContent = data.likeCount;
+        document.getElementById('dislikeCount').textContent = data.disLikeCount;
+    }
+};
 </script>
 </body>
 </html>

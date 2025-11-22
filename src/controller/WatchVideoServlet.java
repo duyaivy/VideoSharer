@@ -8,7 +8,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+
 
 import helpers.ViewPath;
 import model.BO.commentBO;
@@ -45,15 +45,7 @@ public class WatchVideoServlet extends HttpServlet {
 			return;
 		}
 
-		HttpSession session = request.getSession(false);
-		model.Bean.User user = (session != null) ? (model.Bean.User) session.getAttribute("user") : null;
-
-		if (user == null) {
-			response.sendRedirect(request.getContextPath() + "/login");
-			return;
-		}
-
-		
+	
 
 		try {
 			int videoId = Integer.parseInt(params);

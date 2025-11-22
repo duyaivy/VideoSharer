@@ -23,9 +23,8 @@ public class ImageServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String pathInfo = request.getPathInfo();
-        // VD: /original/video_40/thumb.jpg
-
-        System.out.println("⭐ ImageServlet requested: " + pathInfo);
+     
+     
 
         if (pathInfo == null || pathInfo.equals("/")) {
             response.sendError(404);
@@ -36,9 +35,6 @@ public class ImageServlet extends HttpServlet {
 
         Path filePath = Paths.get(UPLOADS_DIR, relativePath);
         File requestedFile = filePath.toFile();
-
-        System.out.println("📁 Full path: " + requestedFile.getAbsolutePath());
-        System.out.println("📁 File exists: " + requestedFile.exists());
 
         if (!requestedFile.exists() || requestedFile.isDirectory()) {
             System.out.println("file not found!");

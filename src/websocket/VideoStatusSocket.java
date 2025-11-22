@@ -35,10 +35,10 @@ public class VideoStatusSocket {
 
 	@OnMessage
 	public void onMessage(String msg, Session session) {
-		// không cần xử lý message từ client
+		
 	}
 
-	// server dùng hàm này để bắn trạng thái
+	
 	public static void broadcast(String jsonMessage) {
 		sessions.values().forEach(s -> {
 			try {

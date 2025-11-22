@@ -8,8 +8,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
 import model.BO.commentBO;
+import model.Bean.Comment;
 import model.Bean.User;
+import websocket.WatchVideoSocket;
 
 /**
  * Servlet implementation class CommentServlet
@@ -78,9 +83,22 @@ public class CommentServlet extends HttpServlet {
         
         try {
             int videoId = Integer.parseInt(video_id);
-            
-            
-            commentBO.getInstance().writeComment(userId, videoId, message);
+            Comment c =  commentBO.getInstance().writeComment(userId, videoId, message);
+           
+            if(c != null) {
+                Gson gson = new Gson();
+        	    JsonObject json = new JsonObject();
+        	    json.addProperty("type", "comment");
+        	    json.addProperty("comment_id", c.getCommentId());
+        	    json.addProperty("email", c.getUserEmail());
+        	    json.addProperty("name", c.getUserName());
+        	    json.addProperty("message", c.getMessage());
+        	   
+        	   String msg =  gson.toJson(json);
+        	    
+            	WatchVideoSocket.broadcast(video_id, msg);
+            	
+            }
             response.sendRedirect(request.getContextPath() + "/watch?id=" + videoId);
             return;
         } catch (Exception e) {

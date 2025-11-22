@@ -34,10 +34,8 @@ public class DeleteVideoServlet extends HttpServlet {
 		String idS = request.getParameter("id");
 		if (idS != null) {
 			int id = Integer.parseInt(idS);
-			videoBO bo = new videoBO();
-			bo.softDeleteVideo(id, user.getId());
+			videoBO.getInstance().softDeleteVideo(id, user.getId());
 		}
-
 		response.sendRedirect(request.getContextPath() + "/manage-video");
 	}
 }
