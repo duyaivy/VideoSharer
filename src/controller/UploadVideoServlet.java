@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 import model.Bean.User;
-import helpers.ViewPath;
+import helpers.PathHelper;
 
 @WebServlet("/upload-video")
 @MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2, // 2MB
@@ -37,7 +37,7 @@ public class UploadVideoServlet extends HttpServlet {
             return;
         }
 
-        request.getRequestDispatcher(ViewPath.resolve("UploadVideo")).forward(request, response);
+        request.getRequestDispatcher(PathHelper.resolve("UploadVideo")).forward(request, response);
     }
 
     @Override
@@ -66,14 +66,14 @@ public class UploadVideoServlet extends HttpServlet {
             if (!isValidExtension(fileExtension)) {
                 request.setAttribute("error",
                         "Định dạng file không hợp lệ! Chỉ chấp nhận: MP4, AVI, MOV, MKV, FLV, WMV");
-                request.getRequestDispatcher(ViewPath.resolve("UploadVideo")).forward(request, response);
+                request.getRequestDispatcher(PathHelper.resolve("UploadVideo")).forward(request, response);
                 return;
             }
 
             long fileSize = filePart.getSize();
             if (fileSize > MAX_FILE_SIZE) {
                 request.setAttribute("error", "File quá lớn! Kích thước tối đa: 100MB");
-                request.getRequestDispatcher(ViewPath.resolve("UploadVideo")).forward(request, response);
+                request.getRequestDispatcher(PathHelper.resolve("UploadVideo")).forward(request, response);
                 return;
             }
 
@@ -86,12 +86,12 @@ public class UploadVideoServlet extends HttpServlet {
             }
 
             request.setAttribute("error", "Có lỗi trong lúc tải file");
-            request.getRequestDispatcher(ViewPath.resolve("UploadVideo")).forward(request, response);
+            request.getRequestDispatcher(PathHelper.resolve("UploadVideo")).forward(request, response);
 
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "Lỗi khi upload video: " + e.getMessage());
-            request.getRequestDispatcher(ViewPath.resolve("UploadVideo")).forward(request, response);
+            request.getRequestDispatcher(PathHelper.resolve("UploadVideo")).forward(request, response);
         }
     }
 

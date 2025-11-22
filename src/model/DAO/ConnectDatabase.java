@@ -3,35 +3,44 @@ package model.DAO;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-
+import helpers.EnvLoader;
 
 public class ConnectDatabase {
-
+    
     public static Connection getMySQLConnection() {
-        String dbURL = "jdbc:mysql://localhost:3306/video_sharer"
-                     + "?useUnicode=true&characterEncoding=UTF-8";
-        String username = "root";
-        String password = "";
+        
+        String host = EnvLoader.get("DB_HOST", "localhost");
+        String port = EnvLoader.get("DB_PORT", "3306");
+        String dbName = EnvLoader.get("DB_NAME", "video_sharer");
+        String username = EnvLoader.get("DB_USER", "root");
+        String password = EnvLoader.get("DB_PASSWORD", "");
+        
+       
+        String dbURL = String.format(
+            "jdbc:mysql://%s:%s/%s?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC",
+            host, port, dbName
+        );
+        
 
         try {
-            // Driver CŨ
-        	Class.forName("com.mysql.cj.jdbc.Driver");
-
-            Connection conn = (Connection) DriverManager.getConnection(dbURL, username, password);
-            System.out.println("Ket noi thah cong");
+          
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            
+          
+            Connection conn = DriverManager.getConnection(dbURL, username, password);   
+            System.out.println("ket noi thah cong");
             return conn;
-
+            
         } catch (ClassNotFoundException e) {
-            System.err.println("Loi");
+           
             e.printStackTrace();
         } catch (SQLException e) {
-            System.err.println("Loi");
-            System.err.println("Message: " + e.getMessage());
-            System.err.println("SQLState: " + e.getSQLState());
-            System.err.println("ErrorCode: " + e.getErrorCode());
+           
             e.printStackTrace();
         }
-
+        
         return null;
     }
+    
+
 }

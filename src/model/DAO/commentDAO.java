@@ -9,7 +9,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 import model.Bean.Comment;
-import model.Bean.Video;
+
 
 public class commentDAO {
 	Connection conn = null;

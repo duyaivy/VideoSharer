@@ -8,7 +8,7 @@ import com.google.gson.JsonObject;
 
 import helpers.Common;
 import helpers.Ffmpeg;
-import helpers.ViewPath;
+import helpers.PathHelper;
 import model.Bean.Video;
 import model.Bean.VideoQueue;
 import model.DAO.VideoQueueDAO;
@@ -49,12 +49,12 @@ public class VideoQueueWorker implements Runnable {
 				}
 
 				String videoPath = video.getPath();
-				Path fullVideoPath = ViewPath.getOriginalPath().getParent().getParent().resolve(videoPath);
+				Path fullVideoPath = PathHelper.getOriginalPath().getParent().getParent().resolve(videoPath);
 
 				System.out.println("Input video: " + fullVideoPath.toAbsolutePath());
 
 				String videoFolder = Paths.get(videoPath).getName(Paths.get(videoPath).getNameCount() - 2).toString();
-				Path hlsOutputDir = ViewPath.getHlsPath().resolve(videoFolder);
+				Path hlsOutputDir = PathHelper.getHlsPath().resolve(videoFolder);
 
 				System.out.println("HLS output: " + hlsOutputDir.toAbsolutePath());
 
@@ -106,7 +106,6 @@ public class VideoQueueWorker implements Runnable {
 		running = false;
 	}
 
-	// ========== gửi JSON status qua WebSocket ==========
 	private void sendStatus(int videoId, String status) {
 		try {
 			JsonObject obj = new JsonObject();

@@ -9,6 +9,15 @@
     String keyword = (String) request.getAttribute("keyword");
     Boolean isSearchMode = (Boolean) request.getAttribute("isSearchMode");
     Boolean isTrendingMode = (Boolean) request.getAttribute("isTrendingMode");
+    
+   
+    Integer currentPage = (Integer) request.getAttribute("currentPage");
+    Integer totalPages = (Integer) request.getAttribute("totalPages"); 
+   
+    if (currentPage == null)
+    	currentPage = 1;
+    if (totalPages == null)
+    	totalPages = 1;
 %>
 <!DOCTYPE html>
 <html>
@@ -159,13 +168,109 @@
                     } 
                     %>
                 </div>
+                <div class="pagination">
+					<%
+					if (totalPages > 1) {
+					%>
+					<div class="pagination-inner">
+						<%
+						// Xác định URL base dựa trên chế độ hiện tại
+						String baseUrl = request.getContextPath();
+						String queryParams = "";
+						
+						if (isSearchMode != null && isSearchMode && keyword != null) {
+							baseUrl += "/search";
+							queryParams = "?q=" + java.net.URLEncoder.encode(keyword, "UTF-8") + "&page=";
+						} else if (isTrendingMode != null && isTrendingMode) {
+							baseUrl += "/trending";
+							queryParams = "?page=";
+						} else {
+							baseUrl += "/home";
+							queryParams = "?page=";
+						}
+						
+						if (currentPage > 1) {
+						%>
+						<a href="<%=baseUrl + queryParams + (currentPage - 1)%>" class="page-btn"> ‹ Trước </a>
+						<%
+						}
+						%>
+
+						<div class="page-numbers">
+							<%
+							int maxVisible = 5; // Số trang tối đa hiển thị
+							int halfVisible = maxVisible / 2;
+							
+							int startPage = Math.max(1, currentPage - halfVisible);
+							int endPage = Math.min(totalPages, currentPage + halfVisible);
+							
+							// Điều chỉnh để luôn hiển thị đủ maxVisible trang (nếu có đủ)
+							if (endPage - startPage + 1 < maxVisible) {
+								if (startPage == 1) {
+									endPage = Math.min(totalPages, startPage + maxVisible - 1);
+								} else if (endPage == totalPages) {
+									startPage = Math.max(1, endPage - maxVisible + 1);
+								}
+							}
+							
+							// Hiển thị trang đầu tiên và dấu ...
+							if (startPage > 1) {
+							%>
+							<a href="<%=baseUrl + queryParams%>1" class="page-number">1</a>
+							<%
+							if (startPage > 2) {
+							%>
+							<span class="page-ellipsis">...</span>
+							<%
+							}
+							}
+							
+							// Hiển thị các trang trong khoảng
+							for (int i = startPage; i <= endPage; i++) {
+								if (i == currentPage) {
+							%>
+							<span class="page-number active"><%=i%></span>
+							<%
+							} else {
+							%>
+							<a href="<%=baseUrl + queryParams + i%>" class="page-number"><%=i%></a>
+							<%
+							}
+							}
+							
+							// Hiển thị dấu ... và trang cuối cùng
+							if (endPage < totalPages) {
+								if (endPage < totalPages - 1) {
+							%>
+							<span class="page-ellipsis">...</span>
+							<%
+							}
+							%>
+							<a href="<%=baseUrl + queryParams + totalPages%>" class="page-number"><%=totalPages%></a>
+							<%
+							}
+							%>
+						</div>
+
+						<%
+						if (currentPage < totalPages) {
+						%>
+						<a href="<%=baseUrl + queryParams + (currentPage + 1)%>" class="page-btn"> Sau › </a>
+						<%
+						}
+						%>
+					</div>
+					<%
+					}
+					%>
+				</div>
             <% } else { %>
                 <!-- ⭐ KHÔNG CÓ VIDEO -->
                 <div class="no-videos">
                     <% 
                     if (isSearchMode != null && isSearchMode && keyword != null && !keyword.isEmpty()) { 
                     %>
-                        <!-- Đang search nhưng không tìm thấy -->
+                      
                         <div class="no-videos-icon">🔍</div>
                         <h3>Không tìm thấy kết quả nào!</h3>
                         <p>Không tìm thấy video nào với từ khóa "<%= keyword %>"</p>
@@ -175,7 +280,7 @@
                     <% 
                     } else if (isTrendingMode != null && isTrendingMode) { 
                     %>
-                        <!-- Trending nhưng không có video -->
+                      
                         <div class="no-videos-icon">🔥</div>
                         <h3>Chưa có video xu hướng!</h3>
                         <p>Hãy là người đầu tiên đăng tải video</p>

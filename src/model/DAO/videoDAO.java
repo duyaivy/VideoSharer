@@ -163,7 +163,6 @@ public class videoDAO {
 		}
 	}
 
-	
 	public int countByAuthor(int authorId) {
 		String sql = "SELECT COUNT(*) FROM video WHERE author_id = ? AND is_delete = 0";
 		try (Connection conn = ConnectDatabase.getMySQLConnection();
@@ -181,7 +180,6 @@ public class videoDAO {
 		return 0;
 	}
 
-	
 	public List<Video> getVideosByAuthor(int authorId, int offset, int limit) {
 		List<Video> list = new ArrayList<>();
 		String sql = "SELECT * FROM video " + "WHERE author_id = ? AND is_delete = 0 " + "ORDER BY create_at DESC "
@@ -248,11 +246,10 @@ public class videoDAO {
 		return false;
 	}
 
-	
 	public ArrayList<Video> getTrendingVideo(int page, int size) {
 		ArrayList<Video> ls = new ArrayList<>();
 
-		String sql = "SELECT * FROM video " + "WHERE is_delete = 0 " + "ORDER BY view DESC " + "LIMIT ? OFFSET ?";
+		String sql = "select v.*, u.name from video v join user u on u.id = v.author_id limit ? offset ?";
 
 		try (Connection conn = ConnectDatabase.getMySQLConnection();
 				PreparedStatement pstm = conn.prepareStatement(sql)) {
@@ -273,6 +270,7 @@ public class videoDAO {
 					video.setCreateAt(rs.getTimestamp("create_at"));
 					video.setStatus(rs.getString("status"));
 					video.setView(rs.getLong("view"));
+					video.setAuthorName(rs.getString("name"));
 
 					if (!"done".equals(video.getStatus()))
 						continue;
@@ -289,115 +287,178 @@ public class videoDAO {
 	}
 
 	public ArrayList<Video> getLastestVideo(int limit, int page) {
-	    ArrayList<Video> videos = new ArrayList<>();
-	    Connection conn = null;
-	    PreparedStatement pstm = null;
-	    ResultSet rs = null;
+		ArrayList<Video> videos = new ArrayList<>();
+		Connection conn = null;
+		PreparedStatement pstm = null;
+		ResultSet rs = null;
 
-	    try {
-	        conn = ConnectDatabase.getMySQLConnection();
+		try {
+			conn = ConnectDatabase.getMySQLConnection();
 
-	        String sql = "SELECT v.*, u.name AS author_name "
-	                   + "FROM video v "
-	                   + "JOIN user u ON v.author_id = u.id "
-	                   + "WHERE v.status IN ('ready','done','pending','processing') "
-	                   + "AND v.is_delete = 0 "
-	                   + "ORDER BY v.create_at DESC "
-	                   + "LIMIT ?, ?";  
+			String sql = "SELECT v.*, u.name AS author_name "
+					+ "FROM video v "
+					+ "JOIN user u ON v.author_id = u.id "
+					+ "WHERE v.status IN ('ready','done','pending','processing') "
+					+ "AND v.is_delete = 0 "
+					+ "ORDER BY v.create_at DESC "
+					+ "LIMIT ?, ?";
 
-	        int offset = (page - 1) * limit;
-	        if (offset < 0) offset = 0;
+			int offset = (page - 1) * limit;
+			if (offset < 0)
+				offset = 0;
 
-	        pstm = conn.prepareStatement(sql);
-	        pstm.setInt(2, offset);
-	        pstm.setInt(1, limit);
+			pstm = conn.prepareStatement(sql);
+			pstm.setInt(2, offset);
+			pstm.setInt(1, limit);
 
-	        rs = pstm.executeQuery();
+			rs = pstm.executeQuery();
 
-	        while (rs.next()) {
-	            Video video = new Video();
-	            video.setVideoId(rs.getInt("video_id"));
-	            video.setAuthorId(rs.getInt("author_id"));
-	            video.setTitle(rs.getString("title"));
-	            video.setDescription(rs.getString("description"));
-	            video.setImg(rs.getString("img"));
-	            video.setCreateAt(rs.getTimestamp("create_at"));
-	            video.setStatus(rs.getString("status"));
-	            video.setPath(rs.getString("path"));
-	            video.setView(rs.getLong("view"));
-	            video.setAuthorName(rs.getString("author_name"));
+			while (rs.next()) {
+				Video video = new Video();
+				video.setVideoId(rs.getInt("video_id"));
+				video.setAuthorId(rs.getInt("author_id"));
+				video.setTitle(rs.getString("title"));
+				video.setDescription(rs.getString("description"));
+				video.setImg(rs.getString("img"));
+				video.setCreateAt(rs.getTimestamp("create_at"));
+				video.setStatus(rs.getString("status"));
+				video.setPath(rs.getString("path"));
+				video.setView(rs.getLong("view"));
+				video.setAuthorName(rs.getString("author_name"));
 
-	            videos.add(video);
-	        }
+				videos.add(video);
+			}
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    } finally {
-	        try {
-	            if (rs != null) rs.close();
-	            if (pstm != null) pstm.close();
-	            if (conn != null) conn.close();
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	        }
-	    }
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+				if (pstm != null)
+					pstm.close();
+				if (conn != null)
+					conn.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 
-	    return videos;
+		return videos;
 	}
-	public List<Video> searchVideos(String keyword) {
-	    List<Video> videos = new ArrayList<>();
-	    Connection conn = null;
-	    PreparedStatement pstm = null;
-	    ResultSet rs = null;
-	    
-	    try {
-	        conn = ConnectDatabase.getMySQLConnection();
-	        
-	        String sql = "SELECT v.*, u.name as author_name " +
-	                     "FROM video v " +
-	                     "JOIN user u ON v.author_id = u.id " +
-	                     "WHERE v.status = 'done' " +
-	                     "AND (v.title LIKE ? OR v.description LIKE ? OR u.name LIKE ?) " +
-	                     "ORDER BY v.create_at DESC " +
-	                     "LIMIT 50";
-	        
-	        pstm = conn.prepareStatement(sql);
-	        String searchPattern = "%" + keyword + "%";
-	        pstm.setString(1, searchPattern);
-	        pstm.setString(2, searchPattern);
-	        pstm.setString(3, searchPattern);
-	        
-	        rs = pstm.executeQuery();
-	        
-	        while (rs.next()) {
-	            Video video = new Video();
-	            video.setVideoId(rs.getInt("video_id"));
-	            video.setAuthorId(rs.getInt("author_id"));
-	            video.setTitle(rs.getString("title"));
-	            video.setDescription(rs.getString("description"));
-	            video.setImg(rs.getString("img"));
-	            video.setCreateAt(rs.getTimestamp("create_at"));
-	            video.setStatus(rs.getString("status"));
-	            video.setPath(rs.getString("path"));
-	            video.setView(rs.getLong("view"));
-	            video.setAuthorName(rs.getString("author_name"));
-	            
-	            videos.add(video);
-	        }
-	        
-	    } catch (Exception e) {
-	        System.err.println("❌ Error searching videos!");
-	        e.printStackTrace();
-	    } finally {
-	        try {
-	            if (rs != null) rs.close();
-	            if (pstm != null) pstm.close();
-	            if (conn != null) conn.close();
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	        }
-	    }
-	    
-	    return videos;
+
+	public int countLastestVideos() {
+		String sql = "SELECT COUNT(*) FROM video WHERE status IN ('ready','done','pending','processing') AND is_delete = 0";
+		try (Connection conn = ConnectDatabase.getMySQLConnection();
+				PreparedStatement pstm = conn.prepareStatement(sql);
+				ResultSet rs = pstm.executeQuery()) {
+			if (rs.next()) {
+				return rs.getInt(1);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+
+	// Đếm tổng số video trending
+	public int countTrendingVideos() {
+		String sql = "SELECT COUNT(*) FROM video WHERE status = 'done' AND is_delete = 0";
+		try (Connection conn = ConnectDatabase.getMySQLConnection();
+				PreparedStatement pstm = conn.prepareStatement(sql);
+				ResultSet rs = pstm.executeQuery()) {
+			if (rs.next()) {
+				return rs.getInt(1);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+
+	// Đếm tổng số video theo keyword search
+	public int countSearchVideos(String keyword) {
+		String sql = "SELECT COUNT(*) FROM video v " +
+				"JOIN user u ON v.author_id = u.id " +
+				"WHERE v.status = 'done' " +
+				"AND (v.title LIKE ? OR v.description LIKE ? OR u.name LIKE ?)";
+		try (Connection conn = ConnectDatabase.getMySQLConnection();
+				PreparedStatement pstm = conn.prepareStatement(sql)) {
+			String searchPattern = "%" + keyword + "%";
+			pstm.setString(1, searchPattern);
+			pstm.setString(2, searchPattern);
+			pstm.setString(3, searchPattern);
+			try (ResultSet rs = pstm.executeQuery()) {
+				if (rs.next()) {
+					return rs.getInt(1);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+
+	public List<Video> searchVideos(String keyword, int page, int size) {
+		List<Video> videos = new ArrayList<>();
+		Connection conn = null;
+		PreparedStatement pstm = null;
+		ResultSet rs = null;
+
+		try {
+			conn = ConnectDatabase.getMySQLConnection();
+
+			String sql = "SELECT v.*, u.name as author_name " +
+					"FROM video v " +
+					"JOIN user u ON v.author_id = u.id " +
+					"WHERE v.status = 'done' " +
+					"AND (v.title LIKE ? OR v.description LIKE ? OR u.name LIKE ?) " +
+					"ORDER BY v.create_at DESC " +
+					"LIMIT ? OFFSET ?";
+
+			pstm = conn.prepareStatement(sql);
+			String searchPattern = "%" + keyword + "%";
+			int offset = (page - 1) * size;
+			pstm.setString(1, searchPattern);
+			pstm.setString(2, searchPattern);
+			pstm.setString(3, searchPattern);
+			pstm.setInt(4, size);
+			pstm.setInt(5, offset);
+
+			rs = pstm.executeQuery();
+
+			while (rs.next()) {
+				Video video = new Video();
+				video.setVideoId(rs.getInt("video_id"));
+				video.setAuthorId(rs.getInt("author_id"));
+				video.setTitle(rs.getString("title"));
+				video.setDescription(rs.getString("description"));
+				video.setImg(rs.getString("img"));
+				video.setCreateAt(rs.getTimestamp("create_at"));
+				video.setStatus(rs.getString("status"));
+				video.setPath(rs.getString("path"));
+				video.setView(rs.getLong("view"));
+				video.setAuthorName(rs.getString("author_name"));
+
+				videos.add(video);
+			}
+
+		} catch (Exception e) {
+			System.err.println("❌ Error searching videos!");
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+				if (pstm != null)
+					pstm.close();
+				if (conn != null)
+					conn.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		return videos;
 	}
 }

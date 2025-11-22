@@ -10,7 +10,7 @@ import java.util.List;
 import javax.servlet.http.Part;
 
 import helpers.Ffmpeg;
-import helpers.ViewPath;
+import helpers.PathHelper;
 import model.Bean.Video;
 import model.DAO.VideoQueueDAO;
 import model.DAO.videoDAO;
@@ -31,7 +31,7 @@ public class videoBO {
 		}
 
 		int videoId = vd.getVideoId();
-		Path videoDir = ViewPath.getOriginalPath().resolve("video_" + videoId);
+		Path videoDir = PathHelper.getOriginalPath().resolve("video_" + videoId);
 
 		try {
 
@@ -108,8 +108,20 @@ public class videoBO {
 		return dao.getLastestVideo(page, size);
 	}
 
-	public List<Video> searchVideos(String keyword) {
-		return dao.searchVideos(keyword);
+	public List<Video> searchVideos(String keyword, int page, int size) {
+		return dao.searchVideos(keyword, page, size);
+	}
+
+	public int countLastestVideos() {
+		return dao.countLastestVideos();
+	}
+
+	public int countTrendingVideos() {
+		return dao.countTrendingVideos();
+	}
+
+	public int countSearchVideos(String keyword) {
+		return dao.countSearchVideos(keyword);
 	}
 
 	public Video getVideoById(int id) {
