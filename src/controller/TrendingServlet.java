@@ -11,20 +11,17 @@ import javax.servlet.http.HttpServletResponse;
 import model.BO.videoBO;
 import model.Bean.Video;
 
-
 @WebServlet("/trending")
 public class TrendingServlet extends HttpServlet {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
-            throws ServletException, IOException {
-        
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 
 		String pageS = request.getParameter("page");
 		String sizeS = request.getParameter("size");
-     
+
 		try {
 
 			int page = 1;
@@ -44,21 +41,23 @@ public class TrendingServlet extends HttpServlet {
 				}
 			}
 
-			  
-	      
-	        ArrayList<Video> videos = videoBO.getInstance().getVideoTrending(page, size);
-	        
-	        request.setAttribute("videos", videos);
-	        request.setAttribute("isTrendingMode", true); 
-	        
-	        request.getRequestDispatcher("/home.jsp").forward(request, response);
-			
+			ArrayList<Video> videos = videoBO.getInstance().getVideoTrending(page, size);
+
+			// Tính totalPages
+			int totalVideos = videoBO.getInstance().countTrendingVideos();
+			int totalPages = (int) Math.ceil((double) totalVideos / size);
+
+			request.setAttribute("videos", videos);
+			request.setAttribute("currentPage", page);
+			request.setAttribute("totalPages", totalPages);
+			request.setAttribute("isTrendingMode", true);
+
+			request.getRequestDispatcher("/home.jsp").forward(request, response);
 
 		} catch (NumberFormatException e) {
 			request.setAttribute("message", "Lỗi trong quá trình tải trang");
 			request.getRequestDispatcher("/Error.jsp").forward(request, response);
 		}
-       
-       
-    }
+
+	}
 }

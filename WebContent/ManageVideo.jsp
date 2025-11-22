@@ -7,7 +7,7 @@
 List<Video> videos = (List<Video>) request.getAttribute("videos");
 Integer totalVideos = (Integer) request.getAttribute("totalVideos");
 Integer currentPage = (Integer) request.getAttribute("currentPage");
-Integer totalPages = (Integer) request.getAttribute("totalPages"); // Xử lý null if (totalVideos == null)
+Integer totalPages = (Integer) request.getAttribute("totalPages"); 
 totalVideos = 0;
 if (currentPage == null)
 	currentPage = 1;
@@ -257,7 +257,7 @@ if (videos == null)
           	} else if (status === "failed") {
           		el.classList.add("status-failed");
           	} else {
-          		// các trạng thái đang xử lý / hàng đợi...
+          		
           		el.classList.add("status-processing");
           	}
           }

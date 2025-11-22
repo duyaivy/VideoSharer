@@ -108,8 +108,20 @@ public class videoBO {
 		return dao.getLastestVideo(page, size);
 	}
 
-	public List<Video> searchVideos(String keyword) {
-		return dao.searchVideos(keyword);
+	public List<Video> searchVideos(String keyword, int page, int size) {
+		return dao.searchVideos(keyword, page, size);
+	}
+
+	public int countLastestVideos() {
+		return dao.countLastestVideos();
+	}
+
+	public int countTrendingVideos() {
+		return dao.countTrendingVideos();
+	}
+
+	public int countSearchVideos(String keyword) {
+		return dao.countSearchVideos(keyword);
 	}
 
 	public Video getVideoById(int id) {
