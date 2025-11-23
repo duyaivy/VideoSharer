@@ -13,9 +13,7 @@ import com.google.gson.JsonObject;
 import model.BO.likeBO;
 import websocket.WatchVideoSocket;
 
-/**
- * Servlet implementation class LikeServlet
- */
+
 @WebServlet("/api/like")
 public class LikeServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;

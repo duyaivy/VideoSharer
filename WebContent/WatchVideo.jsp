@@ -20,7 +20,6 @@ if (!video.getStatus().equals("done")) {
 
 User user = (User) session.getAttribute("user");
 
-String videoUrl = request.getContextPath() + "/" + video.getPath();
 Integer likeCount = (Integer) request.getAttribute("like_count");
 Integer dislikeCount = (Integer) request.getAttribute("dislike_count");
 String userLikeStatus = (String) request.getAttribute("user_like_status");
@@ -32,6 +31,18 @@ if (likeCount == null)
 	likeCount = 0;
 if (dislikeCount == null)
 	dislikeCount = 0;
+
+String hlsPath = video.getPath();
+
+String videoUrl = "";
+if (hlsPath != null && !hlsPath.isEmpty()) {
+	videoUrl = request.getContextPath() + "/" + hlsPath;
+}
+
+String posterUrl = "";
+if (video.getImg() != null && !video.getImg().isEmpty()) {
+	posterUrl = request.getContextPath() + "/" + video.getImg();
+}
 %>
 <!DOCTYPE html>
 <html lang="vi">
@@ -73,7 +84,8 @@ body {
 }
 
 .comment-list {
-	width: 100%; margin : 20px auto;
+	width: 100%;
+	margin: 20px auto;
 	padding: 24px;
 	background-color: #fff;
 	border-radius: 12px;
@@ -595,12 +607,12 @@ to {
 				class="nav-item"> <span>🔥</span> <span>Xu hướng</span>
 			</a>
 			<hr>
-			<a href="${pageContext.request.contextPath}/manage-video" class="nav-item">
-                <span>📹</span> <span>Video của tôi</span>
-            </a>
-            <a href="${pageContext.request.contextPath}/profile" class="nav-item">
-                <span>🙍‍♂️ </span> <span>Thông tin cá nhân</span>
-            </a>
+			<a href="${pageContext.request.contextPath}/manage-video"
+				class="nav-item"> <span>📹</span> <span>Video của tôi</span>
+			</a> <a href="${pageContext.request.contextPath}/profile"
+				class="nav-item"> <span>🙍‍♂️ </span> <span>Thông tin cá
+					nhân</span>
+			</a>
 		</nav>
 	</aside>
 
@@ -629,8 +641,7 @@ to {
 				<div class="video-wrapper">
 					<video id="videoPlayer"
 						class="video-js vjs-big-play-centered video-player" controls
-						preload="auto"
-						poster="<%=video.getImg() != null ? request.getContextPath() + "/" + video.getImg() : ""%>">
+						preload="auto" poster="<%=posterUrl%>">
 						<source src="<%=videoUrl%>" type="application/x-mpegURL">
 					</video>
 				</div>

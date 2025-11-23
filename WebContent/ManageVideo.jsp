@@ -4,7 +4,6 @@
 	pageEncoding="UTF-8"%>
 <%@ page import="java.util.List"%>
 <%
-
 List<Video> videos = (List<Video>) request.getAttribute("videos");
 Integer totalVideos = (Integer) request.getAttribute("totalVideos");
 Integer currentPage = (Integer) request.getAttribute("currentPage");
@@ -16,8 +15,7 @@ if (totalPages == null)
 	totalPages = 1;
 if (videos == null)
 	videos = new java.util.ArrayList<>();
-User u = (User)request.getSession().getAttribute("user");
-
+User u = (User) request.getSession().getAttribute("user");
 %>
 <!DOCTYPE html>
 <html>
@@ -30,40 +28,49 @@ User u = (User)request.getSession().getAttribute("user");
 </head>
 <body>
 	<header class="header">
-        <div class="header-left">
-            <button class="menu-btn" onclick="toggleSidebar()">☰</button>
-            <a href="${pageContext.request.contextPath}/home" class="logo">
-                🎬 <span>VideoSharer</span>
-            </a>
-        </div>
-        
-        <div class="header-center">
-            <form action="${pageContext.request.contextPath}/search" method="GET" class="search-form">
-                <input type="text" name="q" 
-                       value= "" 
-                       placeholder="Tìm kiếm video..." 
-                       class="search-input">
-                <button type="submit" class="search-btn">🔍</button>
-            </form>
-        </div>
-        
-        <div class="header-right">
-            <% if (u != null) { %>
-                <a href="${pageContext.request.contextPath}/upload-video" class="upload-btn">📤 Đăng tải</a>
-                <div class="user-info">
-                    
-                    <a href="${pageContext.request.contextPath}/profile" style="color: white; text-decoration: none; margin-right: 15px;"><span class="user-name">🙍‍♂️ <%= u.getName() %></span></a>
-                    <a href="${pageContext.request.contextPath}/logout" class="logout-btn">Đăng xuất</a>
-                </div>
-            <% } else { %>
-                <div class="auth-links">
-                    <a href="${pageContext.request.contextPath}/login">Đăng nhập</a>
-                    <a href="${pageContext.request.contextPath}/signup">Đăng ký</a>
-                </div>
-            <% } %>
-        </div>
-    </header>
-    
+		<div class="header-left">
+			<button class="menu-btn" onclick="toggleSidebar()">☰</button>
+			<a href="${pageContext.request.contextPath}/home" class="logo">
+				🎬 <span>VideoSharer</span>
+			</a>
+		</div>
+
+		<div class="header-center">
+			<form action="${pageContext.request.contextPath}/search" method="GET"
+				class="search-form">
+				<input type="text" name="q" value="" placeholder="Tìm kiếm video..."
+					class="search-input">
+				<button type="submit" class="search-btn">🔍</button>
+			</form>
+		</div>
+
+		<div class="header-right">
+			<%
+			if (u != null) {
+			%>
+			<a href="${pageContext.request.contextPath}/upload-video"
+				class="upload-btn">📤 Đăng tải</a>
+			<div class="user-info">
+
+				<a href="${pageContext.request.contextPath}/profile"
+					style="color: white; text-decoration: none; margin-right: 15px;"><span
+					class="user-name">🙍‍♂️ <%=u.getName()%></span></a> <a
+					href="${pageContext.request.contextPath}/logout" class="logout-btn">Đăng
+					xuất</a>
+			</div>
+			<%
+			} else {
+			%>
+			<div class="auth-links">
+				<a href="${pageContext.request.contextPath}/login">Đăng nhập</a> <a
+					href="${pageContext.request.contextPath}/signup">Đăng ký</a>
+			</div>
+			<%
+			}
+			%>
+		</div>
+	</header>
+
 	<!-- SIDEBAR -->
 	<aside class="sidebar" id="sidebar">
 		<nav>
@@ -143,10 +150,10 @@ User u = (User)request.getSession().getAttribute("user");
 								<td class="cell-thumb">
 									<%
 									if (v.getImg() != null && !v.getImg().isEmpty()) {
-									%> <img src="<%=request.getContextPath()%>/<%=v.getImg()%>"
+									%> <img src="<%=request.getContextPath() + "/" + v.getImg()%>"
 									alt="thumbnail" class="thumb-img" /> <%
  }
- %>
+ %> } %>
 								</td>
 
 								<td class="cell-title">
@@ -251,46 +258,45 @@ User u = (User)request.getSession().getAttribute("user");
 
 	<script>
 	const ws = new WebSocket(
-		    "ws://<%=request.getServerName()%>:<%=request.getServerPort()%><%=request.getContextPath()%>/video-status/<%=u.getId()%>"
-		);
-          function applyStatusStyle(el, status) {
-          	el.classList.remove("status-processing", "status-done",
-          			"status-failed", "status-other");
+		    "ws://<%=request.getServerName()%>:<%=request.getServerPort()%><%=request.getContextPath()%>/video-status/<%=u.getId()%>
+		");
+		function applyStatusStyle(el, status) {
+			el.classList.remove("status-processing", "status-done",
+					"status-failed", "status-other");
 
-          	if (status === "done") {
-          		el.classList.add("status-done");
-          	} else if (status === "failed") {
-          		el.classList.add("status-failed");
-          	} else {
-          		
-          		el.classList.add("status-processing");
-          	}
-          }
+			if (status === "done") {
+				el.classList.add("status-done");
+			} else if (status === "failed") {
+				el.classList.add("status-failed");
+			} else {
 
-          ws.onmessage = function(event) {
-          	const data = JSON.parse(event.data);
-          	const el = document.getElementById("status-" + data.videoId);
+				el.classList.add("status-processing");
+			}
+		}
 
-          	if (el) {
-          		el.innerText = data.status;
-          		applyStatusStyle(el, data.status);
-          	}
-          };
+		ws.onmessage = function(event) {
+			const data = JSON.parse(event.data);
+			const el = document.getElementById("status-" + data.videoId);
 
-          ws.onclose = function() {
-          	setTimeout(function() {
-          		location.reload();
-          	}, 2000);
-          };
+			if (el) {
+				el.innerText = data.status;
+				applyStatusStyle(el, data.status);
+			}
+		};
 
-        
-          window.addEventListener("DOMContentLoaded", function() {
-          	const allStatus = document.querySelectorAll(".status-badge");
-          	allStatus.forEach(function(el) {
-          		applyStatusStyle(el, el.textContent.trim());
-          	});
-          });
-        </script>
+		ws.onclose = function() {
+			setTimeout(function() {
+				location.reload();
+			}, 2000);
+		};
+
+		window.addEventListener("DOMContentLoaded", function() {
+			const allStatus = document.querySelectorAll(".status-badge");
+			allStatus.forEach(function(el) {
+				applyStatusStyle(el, el.textContent.trim());
+			});
+		});
+	</script>
 
 	<style>
 body {

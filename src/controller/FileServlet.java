@@ -1,5 +1,4 @@
 package controller;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -13,38 +12,35 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @WebServlet("/uploads/*")
-public class ImageServlet extends HttpServlet {
+public class FileServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
-
-    private static final String UPLOADS_DIR = "D:\\ECLIPSE2020\\VideoSharer\\WebContent\\uploads";
-
+    
+   
+    private static final String UPLOADS_DIR = "/home/ubuntu/VideoSharer/WebContent/uploads";
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
         String pathInfo = request.getPathInfo();
      
-     
-
         if (pathInfo == null || pathInfo.equals("/")) {
             response.sendError(404);
             return;
         }
-
+        
         String relativePath = pathInfo.startsWith("/") ? pathInfo.substring(1) : pathInfo;
-
         Path filePath = Paths.get(UPLOADS_DIR, relativePath);
         File requestedFile = filePath.toFile();
-
+        
         if (!requestedFile.exists() || requestedFile.isDirectory()) {
-            System.out.println("file not found!");
+            System.out.println("File not found: " + requestedFile.getAbsolutePath());
             response.sendError(404);
             return;
         }
-
+        
         String fileName = requestedFile.getName().toLowerCase();
         String contentType;
-
+        
         if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
             contentType = "image/jpeg";
         } else if (fileName.endsWith(".png")) {
@@ -62,22 +58,22 @@ public class ImageServlet extends HttpServlet {
         } else {
             contentType = "application/octet-stream";
         }
-
+        
         response.setContentType(contentType);
         response.setContentLengthLong(requestedFile.length());
         response.setHeader("Accept-Ranges", "bytes");
         response.setHeader("Cache-Control", "public, max-age=31536000");
-
+        
+       
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        
         try (FileInputStream in = new FileInputStream(requestedFile);
                 OutputStream out = response.getOutputStream()) {
-
             byte[] buffer = new byte[8192];
             int bytesRead;
-
             while ((bytesRead = in.read(buffer)) != -1) {
                 out.write(buffer, 0, bytesRead);
             }
         }
-
     }
 }

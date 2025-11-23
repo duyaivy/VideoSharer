@@ -39,6 +39,11 @@ public class PathHelper {
 	  
 	    String os = System.getProperty("os.name").toLowerCase();
 	    
+	    if (os.contains("linux") || os.contains("unix")) {
+			FFPROBE_PATH = "/usr/bin/ffmpeg";
+			return FFPROBE_PATH;
+		}
+	    
 	    if (os.contains("win")) {
 	      
 	        java.nio.file.Path ffmpegPath = Paths.get(PROJECT_PATH, "WebContent", "WEB-INF", "lib", "ffmpeg.exe");
@@ -61,7 +66,10 @@ public class PathHelper {
 	    
 	   
 	    String os = System.getProperty("os.name").toLowerCase();
-	    
+	    if (os.contains("linux") || os.contains("unix")) {
+			FFPROBE_PATH = "/usr/bin/ffprobe";
+			return FFPROBE_PATH;
+		}
 	    if (os.contains("win")) {
 	       
 	        java.nio.file.Path ffprobePath = Paths.get(PROJECT_PATH, "WebContent", "WEB-INF", "lib", "ffprobe.exe");
