@@ -100,6 +100,11 @@ public class videoBO {
 		return bo;
 	}
 
+	public int getAuthorIdByVideoId(int videoId) {
+		Video v = dao.getVideoByID(videoId);
+		return v.getAuthorId();
+	}
+
 	public ArrayList<Video> getVideoTrending(int page, int size) {
 		return dao.getTrendingVideo(page, size);
 	}
