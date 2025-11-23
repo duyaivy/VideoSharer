@@ -99,12 +99,16 @@ public class videoBO {
 			bo = new videoBO();
 		return bo;
 	}
-
+	public boolean updateVideoPath(int videoId, String path, String img) {
+		return dao.updateVideoPath(videoId, path, img);
+	}
 	public int getAuthorIdByVideoId(int videoId) {
 		Video v = dao.getVideoByID(videoId);
 		return v.getAuthorId();
 	}
-
+	public boolean updateVideoStatus(int videoId, String status) {
+		return dao.updateVideoStatus(videoId, status);
+	}
 	public ArrayList<Video> getVideoTrending(int page, int size) {
 		return dao.getTrendingVideo(page, size);
 	}

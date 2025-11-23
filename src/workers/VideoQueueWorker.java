@@ -9,6 +9,7 @@ import com.google.gson.JsonObject;
 import helpers.Common;
 import helpers.Ffmpeg;
 import helpers.PathHelper;
+import model.BO.queueBO;
 import model.BO.videoBO;
 import model.Bean.Video;
 import model.Bean.VideoQueue;
@@ -23,12 +24,11 @@ public class VideoQueueWorker implements Runnable {
 	@Override
 	public void run() {
 
-		VideoQueueDAO queueDAO = new VideoQueueDAO();
-		videoDAO vdDAO = new videoDAO();
+		
 
 		while (running) {
 			try {
-				VideoQueue task = queueDAO.getNextPendingTask();
+				VideoQueue task = queueBO.getInstance().getNextPendingTask();
 
 				if (task == null) {
 					Thread.sleep(5000);
@@ -36,15 +36,15 @@ public class VideoQueueWorker implements Runnable {
 				}
 
 				// processing
-				queueDAO.updateStatus(task.getQueueId(), "processing");
-				vdDAO.updateVideoStatus(task.getVideoId(), "processing");
+				queueBO.getInstance().updateStatus(task.getQueueId(), "processing");
+				videoBO.getInstance().updateVideoStatus(task.getVideoId(), "processing");
 				sendStatus(task.getVideoId(), "processing");
 
-				Video video = vdDAO.getVideoByID(task.getVideoId());
+				Video video = videoBO.getInstance().getVideoById(task.getVideoId());
 				if (video == null) {
 					System.err.println(" not found: " + task.getVideoId());
-					queueDAO.updateStatus(task.getQueueId(), "failed");
-					vdDAO.updateVideoStatus(task.getVideoId(), "failed");
+					queueBO.getInstance().updateStatus(task.getQueueId(), "failed");
+					videoBO.getInstance().updateVideoStatus(task.getVideoId(), "failed");
 					sendStatus(task.getVideoId(), "failed");
 					continue;
 				}
@@ -67,23 +67,23 @@ public class VideoQueueWorker implements Runnable {
 					Common.deleteVideoOriginal(fullVideoPath);
 
 					String hlsPath = "uploads/hls/" + videoFolder + "/master.m3u8";
-					vdDAO.updateVideoPath(task.getVideoId(), hlsPath, video.getImg());
+					videoBO.getInstance().updateVideoPath(task.getVideoId(), hlsPath, video.getImg());
 
-					queueDAO.updateStatus(task.getQueueId(), "done");
-					vdDAO.updateVideoStatus(task.getVideoId(), "done");
+					queueBO.getInstance().updateStatus(task.getQueueId(), "done");
+					videoBO.getInstance().updateVideoStatus(task.getVideoId(), "done");
 					sendStatus(task.getVideoId(), "done");
 
 				} else {
 
 					if (task.getRetryCount() < MAX_RETRY) {
-						queueDAO.incrementCount(task.getQueueId());
-						queueDAO.updateStatus(task.getQueueId(), "pending");
-						vdDAO.updateVideoStatus(task.getVideoId(), "pending");
+						queueBO.getInstance().incrementCount(task.getQueueId());
+						queueBO.getInstance().updateStatus(task.getQueueId(), "pending");
+						videoBO.getInstance().updateVideoStatus(task.getVideoId(), "pending");
 						sendStatus(task.getVideoId(), "pending");
 
 					} else {
-						queueDAO.updateStatus(task.getQueueId(), "failed");
-						vdDAO.updateVideoStatus(task.getVideoId(), "failed");
+						queueBO.getInstance().updateStatus(task.getQueueId(), "failed");
+						videoBO.getInstance().updateVideoStatus(task.getVideoId(), "failed");
 						sendStatus(task.getVideoId(), "failed");
 					}
 				}
@@ -115,7 +115,7 @@ public class VideoQueueWorker implements Runnable {
 			obj.addProperty("status", status);
 
 			String json = new Gson().toJson(obj);
-			System.out.println("tesst "+ userId);
+			
 			VideoStatusSocket.broadcast(Integer.toString(userId),json);
 		} catch (Exception e) {
 			e.printStackTrace();

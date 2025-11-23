@@ -12,14 +12,14 @@ public class initialThread implements ServletContextListener {
     
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        // Load .env
+       
         EnvLoader.load();
         
-        // Set webapp path
+      
         String webappPath = sce.getServletContext().getRealPath("/");
         System.setProperty("webapp.path", webappPath);
         
-        // Start worker
+     
         worker = new VideoQueueWorker();
         workerThread = new Thread(worker);
         workerThread.setDaemon(true);
