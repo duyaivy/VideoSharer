@@ -256,11 +256,10 @@ User u = (User) request.getSession().getAttribute("user");
           }
           
         </script>
-
 	<script>
 	const ws = new WebSocket(
-		    "ws://<%=request.getServerName()%>:<%=request.getServerPort()%><%=request.getContextPath()%>/video-status/<%=u.getId()%>
-		");
+		    "ws://<%=request.getServerName()%>:<%=request.getServerPort()%><%=request.getContextPath()%>/video-status/<%=u.getId()%>");
+	console.log( "ws://<%=request.getServerName()%>:<%=request.getServerPort()%><%=request.getContextPath()%>/video-status/<%=u.getId()%>");
 		function applyStatusStyle(el, status) {
 			el.classList.remove("status-processing", "status-done",
 					"status-failed", "status-other");
