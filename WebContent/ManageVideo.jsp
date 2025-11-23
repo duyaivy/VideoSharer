@@ -153,7 +153,7 @@ User u = (User) request.getSession().getAttribute("user");
 									%> <img src="<%=request.getContextPath() + "/" + v.getImg()%>"
 									alt="thumbnail" class="thumb-img" /> <%
  }
- %> } %>
+ %>
 								</td>
 
 								<td class="cell-title">
