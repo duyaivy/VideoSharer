@@ -26,8 +26,6 @@ public class WatchVideoSocket{
 		rooms.computeIfAbsent(video_id, k -> new CopyOnWriteArraySet<>()).add(session);
 		sessionRooms.put(session.getId(), video_id);
 
-		
-
 	}
 
 	@OnClose

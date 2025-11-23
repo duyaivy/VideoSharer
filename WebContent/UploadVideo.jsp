@@ -1,7 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 pageEncoding="UTF-8"%> <%@ page import="model.Bean.User" %> <% User user =
 (User) session.getAttribute("user"); String err = (String)
-request.getAttribute("error"); %>
+request.getAttribute("error"); String savedTitle = (String)
+request.getAttribute("title"); String savedDescription = (String)
+request.getAttribute("description"); 
+if (savedTitle == null) savedTitle = ""; if (savedDescription == null)
+savedDescription = ""; %>
 <!DOCTYPE html>
 <html>
   <head>
@@ -88,7 +92,11 @@ request.getAttribute("error"); %>
         <h1>📹 Upload Video</h1>
         <p class="subtitle">Chia sẻ video của bạn với cộng đồng</p>
 
-        <div class="error-message" id="errorMessage"></div>
+        <% if(err != null && !err.isEmpty()){ %>
+        <div class="error-message show">
+          <strong>⚠️ Lỗi:</strong> <%= err %>
+        </div>
+        <% } %>
 
         <form
           action="${pageContext.request.contextPath}/upload-video"
@@ -105,6 +113,7 @@ request.getAttribute("error"); %>
               placeholder="Nhập tiêu đề video..."
               required
               maxlength="200"
+              value="<%= savedTitle %>"
             />
           </div>
 
@@ -115,12 +124,14 @@ request.getAttribute("error"); %>
               name="description"
               placeholder="Mô tả về video của bạn..."
               maxlength="1000"
-            ></textarea>
+            >
+<%= savedDescription %></textarea
+            >
           </div>
 
           <div class="form-group">
             <label>Video file *</label>
-            <label for="videoFile" class="file-upload">
+            <label for="videoFile" class="file-upload" id="fileUploadLabel">
               <div class="file-upload-icon">📁</div>
               <div class="file-upload-text">
                 <strong>Click để chọn file</strong>
@@ -135,18 +146,20 @@ request.getAttribute("error"); %>
               name="videoFile"
               accept="video/*"
               required
+              onchange="displayFileInfo()"
             />
+            <div class="file-info" id="fileInfo">
+              <div class="file-name" id="fileName"></div>
+              <div class="file-size" id="fileSize"></div>
+            </div>
           </div>
 
-          <% if(err != null && !err.isEmpty()){ %>
-          <p style="color: red"><%= err %></p>
-          <%} %>
           <!-- Buttons -->
           <div class="btn-group">
             <button
               type="button"
               class="btn-cancel"
-              onclick="window.location.href='video-list'"
+              onclick="window.location.href='${pageContext.request.contextPath}/manage-video'"
             >
               Hủy
             </button>
@@ -164,6 +177,40 @@ request.getAttribute("error"); %>
         const mainContent = document.getElementById("mainContent");
         sidebar.classList.toggle("collapsed");
         mainContent.classList.toggle("expanded");
+      }
+
+      function displayFileInfo() {
+        const fileInput = document.getElementById("videoFile");
+        const fileInfo = document.getElementById("fileInfo");
+        const fileName = document.getElementById("fileName");
+        const fileSize = document.getElementById("fileSize");
+        const fileUploadLabel = document.getElementById("fileUploadLabel");
+
+        if (fileInput.files.length > 0) {
+          const file = fileInput.files[0];
+          const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+
+          fileName.textContent = "📄 " + file.name;
+          fileSize.textContent = "📦 Kích thước: " + sizeMB + " MB";
+
+          // Kiểm tra kích thước file
+          if (file.size > 100 * 1024 * 1024) {
+            fileInfo.style.backgroundColor = "#ffebee";
+            fileName.style.color = "#c62828";
+            fileSize.style.color = "#c62828";
+            fileSize.textContent += " ⚠️ Vượt quá giới hạn 100MB!";
+          } else {
+            fileInfo.style.backgroundColor = "#e8f5e9";
+            fileName.style.color = "#2e7d32";
+            fileSize.style.color = "#66bb6a";
+          }
+
+          fileInfo.classList.add("show");
+          fileUploadLabel.style.borderColor = "#4caf50";
+        } else {
+          fileInfo.classList.remove("show");
+          fileUploadLabel.style.borderColor = "#667eea";
+        }
       }
     </script>
   </body>
@@ -346,14 +393,31 @@ request.getAttribute("error"); %>
     .error-message {
       background: #ffebee;
       color: #c62828;
-      padding: 12px 15px;
+      padding: 15px 20px;
       border-radius: 8px;
       margin-bottom: 20px;
       display: none;
+      border-left: 4px solid #c62828;
+      animation: slideDown 0.3s ease-out;
     }
 
     .error-message.show {
       display: block;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    input[type="file"] {
+      display: none;
     }
   </style>
 </html>

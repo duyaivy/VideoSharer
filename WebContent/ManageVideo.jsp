@@ -1,13 +1,14 @@
+<%@page import="model.Bean.User"%>
 <%@page import="model.Bean.Video"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ page import="java.util.List"%>
 <%
-// Lấy dữ liệu từ request attributes List<Video>
+
 List<Video> videos = (List<Video>) request.getAttribute("videos");
 Integer totalVideos = (Integer) request.getAttribute("totalVideos");
 Integer currentPage = (Integer) request.getAttribute("currentPage");
-Integer totalPages = (Integer) request.getAttribute("totalPages"); 
+Integer totalPages = (Integer) request.getAttribute("totalPages");
 totalVideos = 0;
 if (currentPage == null)
 	currentPage = 1;
@@ -15,6 +16,8 @@ if (totalPages == null)
 	totalPages = 1;
 if (videos == null)
 	videos = new java.util.ArrayList<>();
+User u = (User)request.getSession().getAttribute("user");
+
 %>
 <!DOCTYPE html>
 <html>
@@ -26,37 +29,41 @@ if (videos == null)
 	href="${pageContext.request.contextPath}/assets/css/index.css" />
 </head>
 <body>
-	<!-- HEADER -->
 	<header class="header">
-		<div class="header-left">
-			<button class="menu-btn" onclick="toggleSidebar()">☰</button>
-			<a href="${pageContext.request.contextPath}/home" class="logo">
-				🎬 <span>VideoSharer</span>
-			</a>
-		</div>
-
-		<div class="header-center">
-			<form action="${pageContext.request.contextPath}/search" method="GET"
-				class="search-form">
-				<input type="text" name="q" placeholder="Tìm kiếm video..."
-					class="search-input" />
-				<button type="submit" class="search-btn">🔍</button>
-			</form>
-		</div>
-
-		<div class="header-right">
-			<a href="${pageContext.request.contextPath}/upload-video"
-				class="upload-btn">📤 Đăng tải</a>
-			<div class="user-info">
-				<span class="user-name">👤 User</span> <a
-					href="${pageContext.request.contextPath}/profile"
-					style="color: white; text-decoration: none; margin-right: 15px">⚙️</a>
-				<a href="${pageContext.request.contextPath}/logout"
-					class="logout-btn">Đăng xuất</a>
-			</div>
-		</div>
-	</header>
-
+        <div class="header-left">
+            <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+            <a href="${pageContext.request.contextPath}/home" class="logo">
+                🎬 <span>VideoSharer</span>
+            </a>
+        </div>
+        
+        <div class="header-center">
+            <form action="${pageContext.request.contextPath}/search" method="GET" class="search-form">
+                <input type="text" name="q" 
+                       value= "" 
+                       placeholder="Tìm kiếm video..." 
+                       class="search-input">
+                <button type="submit" class="search-btn">🔍</button>
+            </form>
+        </div>
+        
+        <div class="header-right">
+            <% if (u != null) { %>
+                <a href="${pageContext.request.contextPath}/upload-video" class="upload-btn">📤 Đăng tải</a>
+                <div class="user-info">
+                    
+                    <a href="${pageContext.request.contextPath}/profile" style="color: white; text-decoration: none; margin-right: 15px;"><span class="user-name">🙍‍♂️ <%= u.getName() %></span></a>
+                    <a href="${pageContext.request.contextPath}/logout" class="logout-btn">Đăng xuất</a>
+                </div>
+            <% } else { %>
+                <div class="auth-links">
+                    <a href="${pageContext.request.contextPath}/login">Đăng nhập</a>
+                    <a href="${pageContext.request.contextPath}/signup">Đăng ký</a>
+                </div>
+            <% } %>
+        </div>
+    </header>
+    
 	<!-- SIDEBAR -->
 	<aside class="sidebar" id="sidebar">
 		<nav>
@@ -231,7 +238,6 @@ if (videos == null)
 				%>
 			</div>
 		</div>
-		</div>
 	</main>
 
 	<script>
@@ -244,10 +250,9 @@ if (videos == null)
         </script>
 
 	<script>
-            const ws = new WebSocket(
-                "ws://" + window.location.host + "<%=request.getContextPath()%>
-          /video-status");
-
+	const ws = new WebSocket(
+		    "ws://<%=request.getServerName()%>:<%=request.getServerPort()%><%=request.getContextPath()%>/video-status/<%=u.getId()%>"
+		);
           function applyStatusStyle(el, status) {
           	el.classList.remove("status-processing", "status-done",
           			"status-failed", "status-other");
@@ -278,7 +283,7 @@ if (videos == null)
           	}, 2000);
           };
 
-          // Áp style ban đầu cho các status đã render từ server
+        
           window.addEventListener("DOMContentLoaded", function() {
           	const allStatus = document.querySelectorAll(".status-badge");
           	allStatus.forEach(function(el) {
@@ -448,6 +453,7 @@ body {
 
 .cell-title .video-title-text {
 	font-weight: 600;
+	min-width: 200px;
 	font-size: 14px;
 	color: #111;
 }
@@ -481,6 +487,7 @@ body {
 	border: 1px solid transparent;
 	background: #fff3e0;
 	color: #ef6c00;
+	text-transform: capitalize;
 }
 
 .status-processing {
@@ -621,5 +628,4 @@ body {
 </style>
 </body>
 </html>
-</Video>
-</Video>
+

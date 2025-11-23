@@ -9,6 +9,7 @@ import com.google.gson.JsonObject;
 import helpers.Common;
 import helpers.Ffmpeg;
 import helpers.PathHelper;
+import model.BO.videoBO;
 import model.Bean.Video;
 import model.Bean.VideoQueue;
 import model.DAO.VideoQueueDAO;
@@ -108,12 +109,14 @@ public class VideoQueueWorker implements Runnable {
 
 	private void sendStatus(int videoId, String status) {
 		try {
+			int userId = videoBO.getInstance().getAuthorIdByVideoId(videoId);
 			JsonObject obj = new JsonObject();
 			obj.addProperty("videoId", videoId);
 			obj.addProperty("status", status);
 
 			String json = new Gson().toJson(obj);
-			VideoStatusSocket.broadcast(json);
+			System.out.println("tesst "+ userId);
+			VideoStatusSocket.broadcast(Integer.toString(userId),json);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
