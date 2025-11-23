@@ -3,45 +3,61 @@ package workers;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
+import java.util.ArrayList;
+import java.util.List;
 import helpers.EnvLoader;
 
 @WebListener
 public class initialThread implements ServletContextListener {
-    private Thread workerThread;
-    private VideoQueueWorker worker;
+    private static final int NUM_WORKERS = 3;
+    private List<Thread> workerThreads;
+    private List<VideoQueueWorker> workers;
     
     @Override
     public void contextInitialized(ServletContextEvent sce) {
        
         EnvLoader.load();
-        
       
         String webappPath = sce.getServletContext().getRealPath("/");
         System.setProperty("webapp.path", webappPath);
+   
         
-     
-        worker = new VideoQueueWorker();
-        workerThread = new Thread(worker);
-        workerThread.setDaemon(true);
-        workerThread.start();
+      
+        workerThreads = new ArrayList<>();
+        workers = new ArrayList<>();
+       
+        for (int i = 0; i < NUM_WORKERS; i++) {
+            VideoQueueWorker worker = new VideoQueueWorker();
+            Thread thread = new Thread(worker, "VideoWorker-" + (i + 1));
+            thread.setDaemon(true); 
+            thread.start();
+            
+            workers.add(worker);
+            workerThreads.add(thread);
+         
+        }
+ 
     }
     
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        System.out.println("stop");
-        
-        if (worker != null) {
-            worker.stop();
+     
+        for (int i = 0; i < workers.size(); i++) {
+            workers.get(i).stop();
+          
         }
         
-        if (workerThread != null) {
+      
+        for (int i = 0; i < workerThreads.size(); i++) {
             try {
-                workerThread.join(5000);
+                workerThreads.get(i).join(10000); 
+               
             } catch (InterruptedException e) {
-                e.printStackTrace();
+              
+                workerThreads.get(i).interrupt();
             }
         }
         
-        System.out.println("stopped success!");
+     
     }
 }
