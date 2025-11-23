@@ -8,8 +8,8 @@ public class PathHelper {
 	private static final String SUFFIX_JSP = ".jsp";
 
 	// Load từ .env
-	private static final String PROJECT_PATH = EnvLoader.get("PROJECT_PATH", "/home/ubuntu/VideoSharer");
-	private static final String PREFIX_JAVA = EnvLoader.get("BASE_URL", "/VideoSharer/");
+	private static final String PROJECT_PATH =  "/home/ubuntu/VideoSharer";
+	private static final String PREFIX_JAVA =  "/VideoSharer/";
 
 	// Cache ffmpeg paths
 	private static String FFMPEG_PATH = null;
