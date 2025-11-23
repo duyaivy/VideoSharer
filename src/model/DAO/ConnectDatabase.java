@@ -13,7 +13,7 @@ public class ConnectDatabase {
         String port = EnvLoader.get("DB_PORT", "3306");
         String dbName = EnvLoader.get("DB_NAME", "video_sharer");
         String username = EnvLoader.get("DB_USER", "root");
-        String password = EnvLoader.get("DB_PASSWORD", "");
+        String password = EnvLoader.get("DB_PASSWORD", "123456");
         
        
         String dbURL = String.format(

@@ -8,7 +8,7 @@ public class PathHelper {
 	private static final String SUFFIX_JSP = ".jsp";
 
 	// Load từ .env
-	private static final String PROJECT_PATH = EnvLoader.get("PROJECT_PATH", "D:/ECLIPSE2020/VideoSharer");
+	private static final String PROJECT_PATH = EnvLoader.get("PROJECT_PATH", "/home/ubuntu/VideoSharer");
 	private static final String PREFIX_JAVA = EnvLoader.get("BASE_URL", "/VideoSharer/");
 
 	// Cache ffmpeg paths
