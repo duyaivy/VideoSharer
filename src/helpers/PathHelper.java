@@ -32,37 +32,48 @@ public class PathHelper {
 	}
 
 	public static String getFfmpegPath() {
-		if (FFMPEG_PATH != null) {
-			return FFMPEG_PATH;
-		}
-
-		java.nio.file.Path ffmpegPath = Paths.get(PROJECT_PATH, "WebContent", "WEB-INF", "lib", "ffmpeg.exe");
-		File ffmpegFile = ffmpegPath.toFile();
-
-		if (ffmpegFile.exists() && ffmpegFile.isFile()) {
-			FFMPEG_PATH = ffmpegFile.getAbsolutePath();
-			return FFMPEG_PATH;
-		}
-
-		FFMPEG_PATH = "ffmpeg";
-		return FFMPEG_PATH;
+	    if (FFMPEG_PATH != null) {
+	        return FFMPEG_PATH;
+	    }
+	    
+	  
+	    String os = System.getProperty("os.name").toLowerCase();
+	    
+	    if (os.contains("win")) {
+	      
+	        java.nio.file.Path ffmpegPath = Paths.get(PROJECT_PATH, "WebContent", "WEB-INF", "lib", "ffmpeg.exe");
+	        File ffmpegFile = ffmpegPath.toFile();
+	        if (ffmpegFile.exists() && ffmpegFile.isFile()) {
+	            FFMPEG_PATH = ffmpegFile.getAbsolutePath();
+	            return FFMPEG_PATH;
+	        }
+	    }
+	    
+	
+	    FFMPEG_PATH = "ffmpeg";
+	    return FFMPEG_PATH;
 	}
 
 	public static String getFfprobePath() {
-		if (FFPROBE_PATH != null) {
-			return FFPROBE_PATH;
-		}
-
-		java.nio.file.Path ffprobePath = Paths.get(PROJECT_PATH, "WebContent", "WEB-INF", "lib", "ffprobe.exe");
-		File ffprobeFile = ffprobePath.toFile();
-
-		if (ffprobeFile.exists() && ffprobeFile.isFile()) {
-			FFPROBE_PATH = ffprobeFile.getAbsolutePath();
-			return FFPROBE_PATH;
-		}
-
-		// Fallback: System PATH
-		FFPROBE_PATH = "ffprobe";
-		return FFPROBE_PATH;
+	    if (FFPROBE_PATH != null) {
+	        return FFPROBE_PATH;
+	    }
+	    
+	   
+	    String os = System.getProperty("os.name").toLowerCase();
+	    
+	    if (os.contains("win")) {
+	       
+	        java.nio.file.Path ffprobePath = Paths.get(PROJECT_PATH, "WebContent", "WEB-INF", "lib", "ffprobe.exe");
+	        File ffprobeFile = ffprobePath.toFile();
+	        if (ffprobeFile.exists() && ffprobeFile.isFile()) {
+	            FFPROBE_PATH = ffprobeFile.getAbsolutePath();
+	            return FFPROBE_PATH;
+	        }
+	    }
+	    
+	
+	    FFPROBE_PATH = "ffprobe";
+	    return FFPROBE_PATH;
 	}
 }

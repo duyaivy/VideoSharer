@@ -115,7 +115,7 @@ public class VideoQueueWorker implements Runnable {
 			obj.addProperty("status", status);
 
 			String json = new Gson().toJson(obj);
-			System.out.println("tesst "+ userId);
+		
 			VideoStatusSocket.broadcast(Integer.toString(userId),json);
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -45,7 +45,6 @@ public class WatchVideoServlet extends HttpServlet {
 			return;
 		}
 
-	
 
 		try {
 			int videoId = Integer.parseInt(params);

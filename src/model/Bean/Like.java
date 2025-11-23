@@ -2,9 +2,7 @@ package model.Bean;
 
 import java.sql.Timestamp;
 
-/**
- * Like Bean - Đại diện cho bảng like trong database
- */
+
 public class Like {
     private int likeId;
     private int videoId;

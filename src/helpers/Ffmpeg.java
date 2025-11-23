@@ -40,9 +40,7 @@ public class Ffmpeg {
 		}
 	}
 
-	/**
-	 * Kiểm tra video có audio không
-	 */
+	
 	public static boolean checkVideoHasAudio(String filePath) {
 		try {
 			String ffprobeExe = PathHelper.getFfprobePath();
