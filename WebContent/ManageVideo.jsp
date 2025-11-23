@@ -254,6 +254,7 @@ User u = (User) request.getSession().getAttribute("user");
             sidebar.classList.toggle("collapsed");
             mainContent.classList.toggle("expanded");
           }
+          
         </script>
 
 	<script>
